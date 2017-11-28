@@ -1,0 +1,71 @@
+{
+  "name": "MySQL",
+  "type": "executer",
+  "imgUrl": "MySQL.png",
+  "execProgram": "node",
+  "main": "app.js",
+  "methods": [
+    {
+      "name": "executeQuery",
+      "viewName": "execute query",
+      "params": [
+        {
+          "name": "QUERY",
+          "viewName": "query string",
+          "type": "string"
+        },
+        {
+          "name": "HOST",
+          "viewName": "hostname",
+          "type": "string"
+        },
+        {
+          "name": "USER",
+          "viewName": "user",
+          "type": "string"
+        },
+        {
+          "name": "PASSWORD",
+          "viewName": "password",
+          "type": "string"
+        },
+        {
+          "name": "DB",
+          "viewName": "database",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "executeSQLFile",
+      "viewName": "execute sql file",
+      "params": [
+        {
+          "name": "PATH",
+          "viewName": "SQL file path",
+          "type": "string"
+        },
+        {
+          "name": "HOST",
+          "viewName": "hostname",
+          "type": "string"
+        },
+        {
+          "name": "USER",
+          "viewName": "user",
+          "type": "string"
+        },
+        {
+          "name": "PASSWORD",
+          "viewName": "password",
+          "type": "string"
+        },
+        {
+          "name": "DB",
+          "viewName": "database",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}
