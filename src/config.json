@@ -4,7 +4,8 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "Run sql commands and scripts on MySQL servers.",
   "methods": [
     {
       "name": "executeQuery",
@@ -18,6 +19,11 @@
         {
           "name": "HOST",
           "viewName": "hostname",
+          "type": "string"
+        },
+        {
+          "name": "PORT",
+          "viewName": "port",
           "type": "string"
         },
         {
@@ -49,6 +55,11 @@
         {
           "name": "HOST",
           "viewName": "hostname",
+          "type": "string"
+        },
+        {
+          "name": "PORT",
+          "viewName": "port",
           "type": "string"
         },
         {

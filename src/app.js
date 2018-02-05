@@ -9,6 +9,7 @@ function executeQuery(action) {
     var deferred = q.defer();
     var connection = mysql.createConnection({
         host: action.params.HOST,
+        port: action.params.PORT,
         user: action.params.USER,
         password: action.params.PASSWORD,
         database: action.params.DB
@@ -37,6 +38,7 @@ function executeSQLFile(action) {
 
     var connection = mysql.createConnection({
         host: action.params.HOST,
+        port: action.params.PORT,
         user: action.params.USER,
         password: action.params.PASSWORD,
         database: action.params.DB,
