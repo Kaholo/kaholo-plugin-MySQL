@@ -1,1 +1,1 @@
-# pm-plugin-MySQL
+# kaholo-plugin-MySQL

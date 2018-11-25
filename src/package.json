@@ -1,12 +1,12 @@
 {
-  "name": "pm-plugin-MySQL",
-  "version": "1.0.0",
-  "description": "MySQL plugin for Productionmap",
+  "name": "kaholo-plugin-MySQL",
+  "version": "1.2.0",
+  "description": "MySQL plugin for Kaholo",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Productionmap team (Yehonatan Bitton, Roy Talyosef)",
+  "author": "Kaholo Team",
   "license": "ISC",
   "dependencies": {
     "mysql": "^2.15.0"
