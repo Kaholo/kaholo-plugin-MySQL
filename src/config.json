@@ -4,77 +4,104 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Run sql commands and scripts on MySQL servers.",
+  "settings": [
+    {
+      "name": "host",
+      "viewName": "Host Name",
+      "type": "string"
+    },
+    {
+      "name": "port",
+      "viewName": "Port",
+      "type": "string"
+    },
+    {
+      "name": "username",
+      "viewName": "User Name",
+      "type": "string"
+    },
+    {
+      "name": "password",
+      "viewName": "Password",
+      "type": "vault"
+    },
+    {
+      "name": "db",
+      "viewName": "Database",
+      "type": "string"
+    }
+  ],
   "methods": [
     {
       "name": "executeQuery",
-      "viewName": "execute query",
+      "viewName": "Execute Query",
       "params": [
         {
           "name": "QUERY",
-          "viewName": "query string",
+          "viewName": "Query String",
           "type": "string"
         },
         {
           "name": "HOST",
-          "viewName": "hostname",
+          "viewName": "Host Name",
           "type": "string"
         },
         {
           "name": "PORT",
-          "viewName": "port",
+          "viewName": "Port",
           "type": "string"
         },
         {
           "name": "USER",
-          "viewName": "user",
+          "viewName": "User Name",
           "type": "string"
         },
         {
           "name": "PASSWORD",
-          "viewName": "password",
+          "viewName": "Password",
           "type": "string"
         },
         {
           "name": "DB",
-          "viewName": "database",
+          "viewName": "Database",
           "type": "string"
         }
       ]
     },
     {
       "name": "executeSQLFile",
-      "viewName": "execute sql file",
+      "viewName": "Execute SQL File",
       "params": [
         {
           "name": "PATH",
-          "viewName": "SQL file path",
+          "viewName": "SQL File Path",
           "type": "string"
         },
         {
           "name": "HOST",
-          "viewName": "hostname",
+          "viewName": "Host Name",
           "type": "string"
         },
         {
           "name": "PORT",
-          "viewName": "port",
+          "viewName": "Port",
           "type": "string"
         },
         {
           "name": "USER",
-          "viewName": "user",
+          "viewName": "User Name",
           "type": "string"
         },
         {
           "name": "PASSWORD",
-          "viewName": "password",
+          "viewName": "Password",
           "type": "string"
         },
         {
           "name": "DB",
-          "viewName": "database",
+          "viewName": "Database",
           "type": "string"
         }
       ]
