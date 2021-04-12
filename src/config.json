@@ -4,32 +4,12 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
-      "name": "host",
-      "viewName": "Host Name",
-      "type": "string"
-    },
-    {
-      "name": "port",
-      "viewName": "Port",
-      "type": "string"
-    },
-    {
-      "name": "username",
-      "viewName": "User Name",
-      "type": "string"
-    },
-    {
-      "name": "password",
-      "viewName": "Password",
-      "type": "vault"
-    },
-    {
-      "name": "db",
-      "viewName": "Database",
+      "name": "conStr",
+      "viewName": "Connection String",
       "type": "string"
     }
   ],
@@ -39,33 +19,13 @@
       "viewName": "Execute Query",
       "params": [
         {
-          "name": "QUERY",
+          "name": "query",
           "viewName": "Query String",
           "type": "string"
         },
         {
-          "name": "HOST",
-          "viewName": "Host Name",
-          "type": "string"
-        },
-        {
-          "name": "PORT",
-          "viewName": "Port",
-          "type": "string"
-        },
-        {
-          "name": "USER",
-          "viewName": "User Name",
-          "type": "string"
-        },
-        {
-          "name": "PASSWORD",
-          "viewName": "Password",
-          "type": "string"
-        },
-        {
-          "name": "DB",
-          "viewName": "Database",
+          "name": "conStr",
+          "viewName": "Connection String",
           "type": "string"
         }
       ]
@@ -75,33 +35,13 @@
       "viewName": "Execute SQL File",
       "params": [
         {
-          "name": "PATH",
+          "name": "path",
           "viewName": "SQL File Path",
           "type": "string"
         },
         {
-          "name": "HOST",
-          "viewName": "Host Name",
-          "type": "string"
-        },
-        {
-          "name": "PORT",
-          "viewName": "Port",
-          "type": "string"
-        },
-        {
-          "name": "USER",
-          "viewName": "User Name",
-          "type": "string"
-        },
-        {
-          "name": "PASSWORD",
-          "viewName": "Password",
-          "type": "string"
-        },
-        {
-          "name": "DB",
-          "viewName": "Database",
+          "name": "conStr",
+          "viewName": "Connection String",
           "type": "string"
         }
       ]
