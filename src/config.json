@@ -4,7 +4,7 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
@@ -19,13 +19,13 @@
       "viewName": "Execute Query",
       "params": [
         {
-          "name": "query",
-          "viewName": "Query String",
+          "name": "conStr",
+          "viewName": "Connection String",
           "type": "string"
         },
         {
-          "name": "conStr",
-          "viewName": "Connection String",
+          "name": "query",
+          "viewName": "Query String",
           "type": "string"
         }
       ]
@@ -35,13 +35,13 @@
       "viewName": "Execute SQL File",
       "params": [
         {
-          "name": "path",
-          "viewName": "SQL File Path",
+          "name": "conStr",
+          "viewName": "Connection String",
           "type": "string"
         },
         {
-          "name": "conStr",
-          "viewName": "Connection String",
+          "name": "path",
+          "viewName": "SQL File Path",
           "type": "string"
         }
       ]
