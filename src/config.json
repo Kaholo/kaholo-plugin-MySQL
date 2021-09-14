@@ -4,13 +4,13 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
       "name": "conStr",
       "viewName": "Connection String",
-      "type": "string"
+      "type": "vault"
     }
   ],
   "methods": [
@@ -21,12 +21,12 @@
         {
           "name": "conStr",
           "viewName": "Connection String",
-          "type": "string"
+          "type": "vault"
         },
         {
           "name": "query",
           "viewName": "Query String",
-          "type": "string"
+          "type": "text"
         }
       ]
     },
@@ -37,12 +37,281 @@
         {
           "name": "conStr",
           "viewName": "Connection String",
-          "type": "string"
+          "type": "vault"
         },
         {
           "name": "path",
           "viewName": "SQL File Path",
           "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "testConnectivity",
+      "viewName": "Test Connectivity",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        }
+      ]
+    },
+    {
+      "name": "getTablesLockedStatus",
+      "viewName": "Get Tables Locked Status",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesOrAll"
+        }
+      ]
+    },
+    {
+      "name": "getServerVersion",
+      "viewName": "Get MySQL Server Version",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        }
+      ]
+    },
+    {
+      "name": "getDbSize",
+      "viewName": "Get Databases Size",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
+        }
+      ]
+    },
+    {
+      "name": "getTablesSize",
+      "viewName": "Get Tables Size",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesOrAll"
+        }
+      ]
+    },
+    {
+      "name": "createUser",
+      "viewName": "Create User",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "user",
+          "viewName": "Username",
+          "type": "string"
+        },
+        {
+          "name": "pass",
+          "viewName": "Password",
+          "type": "vault"
+        },
+        {
+          "name": "changePass",
+          "viewName": "Change Password On Login",
+          "type": "boolean"
+        },
+        {
+          "name": "role",
+          "viewName": "Role",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listRolesAuto"
+        },
+        {
+          "name": "db",
+          "viewName": "DB Permission",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
+        },
+        {
+          "name": "table",
+          "viewName": "Table Permission",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesOrAll"
+        },
+        {
+          "name": "scope",
+          "viewName": "Permission Scope",
+          "type": "options",
+          "options": [
+            {
+              "id": "read",
+              "name": "Read Only"
+            },
+            {
+              "id": "write",
+              "name": "Write(Insert/Update/Delete) Only"
+            },
+            {
+              "id": "readWrite",
+              "name": "Read And Write"
+            },
+            {
+              "id": "full",
+              "name": "Full Access"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "grantPermissions",
+      "viewName": "Grant Permissions",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "user",
+          "viewName": "User",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listUsersAuto"
+        },
+        {
+          "name": "db",
+          "viewName": "DB",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesOrAll"
+        },
+        {
+          "name": "scope",
+          "viewName": "Permission Scope",
+          "type": "options",
+          "options": [
+            {
+              "id": "read",
+              "name": "Read Only"
+            },
+            {
+              "id": "write",
+              "name": "Write/Update Only"
+            },
+            {
+              "id": "full",
+              "name": "Full Access"
+            }
+          ]
+        },
+        {
+          "name": "role",
+          "viewName": "Role",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listRolesAuto"
+        }
+      ]
+    },
+    {
+      "name": "listDbs",
+      "viewName": "List Databases",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        }
+      ]
+    },
+    {
+      "name": "listRoles",
+      "viewName": "List Roles",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        }
+      ]
+    },
+    {
+      "name": "listUsers",
+      "viewName": "List Users",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        }
+      ]
+    },
+    {
+      "name": "listTables",
+      "viewName": "List Tables",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
         }
       ]
     }
