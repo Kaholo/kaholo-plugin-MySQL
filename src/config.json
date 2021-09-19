@@ -4,7 +4,7 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
@@ -250,6 +250,10 @@
               "name": "Write/Update Only"
             },
             {
+              "id": "readWrite",
+              "name": "Read And Write"
+            },
+            {
               "id": "full",
               "name": "Full Access"
             }
@@ -261,6 +265,59 @@
           "type": "autocomplete",
           "autocompleteType":"function",
           "functionName":"listRolesAuto"
+        }
+      ]
+    },
+    {
+      "name": "createRole",
+      "viewName": "Create Role",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "role",
+          "viewName": "Role Name",
+          "type": "string"
+        },
+        {
+          "name": "db",
+          "viewName": "DB",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesOrAll"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesOrAll"
+        },
+        {
+          "name": "scope",
+          "viewName": "Permission Scope",
+          "type": "options",
+          "options": [
+            {
+              "id": "read",
+              "name": "Read Only"
+            },
+            {
+              "id": "write",
+              "name": "Write/Update Only"
+            },
+            {
+              "id": "readWrite",
+              "name": "Read And Write"
+            },
+            {
+              "id": "full",
+              "name": "Full Access"
+            }
+          ]
         }
       ]
     },
