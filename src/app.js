@@ -81,6 +81,17 @@ async function grantPermissions(action, settings){
   });
 }
 
+async function createRole(action, settings){
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.createRole({
+    role: parsers.string(action.params.role),
+    db: parsers.autocomplete(action.params.db),
+    table: parsers.autocomplete(action.params.table),
+    scope: action.params.scope
+  });
+}
+
 async function listDbs(action, settings){
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
@@ -117,6 +128,7 @@ module.exports = {
   getTablesSize,
   createUser,
   grantPermissions,
+  createRole,
   // list funcs
   listDbs,
   listTables,

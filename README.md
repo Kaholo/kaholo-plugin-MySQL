@@ -91,6 +91,21 @@ Grant the specified permissions to the specified user.
 * Full Access - Can execute any SQL command.
 6. Role (Autocomplete) **Required If No Permission Scope** - The role to assign to the user. Can't be speecified together with permmision scope, db, and table parameter.
 
+
+## Method: Create Role
+Create a new role and grant it permissions if specified.
+
+### Parameters
+1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
+2. Role Name (String) **Required** - The name of the new role to create.
+3. DB (Autocomplete) **Required for parameter 4** - The name of the database to grant permissions on. Default value is all databases.
+4. Table (Autocomplete) **Optional** - The name of the table to grant permissions on. Default value is all tables in the specified database.
+5. Permission Scope (Options) **Required to grant permission** - The scope of permissions to give to the new user. Possible values are:
+* Read Only - Can only execute SQL SELECT commands.
+* Write(Insert/Update/Delete) Only  - Can execute SQL INSERT\UPDATE\DELETE commands only.
+* Read And Write - Can execute SQL SELECT\INSERT\UPDATE\DELETE commands.
+* Full Access - Can execute any SQL command.
+
 ## Method: List Databases
 List all databases in the connected MySQL server.
 
