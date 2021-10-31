@@ -4,7 +4,7 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
@@ -318,6 +318,24 @@
               "name": "Full Access"
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "deleteUser",
+      "viewName": "Delete User",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "user",
+          "viewName": "User",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listUsersAuto"
         }
       ]
     },

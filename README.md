@@ -59,7 +59,7 @@ Get the specified table size, or of all tables.
 3. Table (Autocomplete) **Optional** - The table to return it's size. If not specified, return data on all tables inside the db specified.
 
 ## Method: Create User
-Create a new user with the specified permmisions.
+Create a new user with the specified permmisions. If fails to grant permissions won't create a new user(Runs entire command as a transaction).
 
 ### Parameters
 1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
@@ -91,9 +91,8 @@ Grant the specified permissions to the specified user.
 * Full Access - Can execute any SQL command.
 6. Role (Autocomplete) **Required If No Permission Scope** - The role to assign to the user. Can't be speecified together with permmision scope, db, and table parameter.
 
-
 ## Method: Create Role
-Create a new role and grant it permissions if specified.
+Create a new role and grant it permissions if specified. If fails to grant permissions won't create a new role(Runs entire command as a transaction).
 
 ### Parameters
 1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
@@ -105,6 +104,13 @@ Create a new role and grant it permissions if specified.
 * Write(Insert/Update/Delete) Only  - Can execute SQL INSERT\UPDATE\DELETE commands only.
 * Read And Write - Can execute SQL SELECT\INSERT\UPDATE\DELETE commands.
 * Full Access - Can execute any SQL command.
+
+## Method: Delete User
+Delete the specified user(can also be a role).
+
+### Parameters
+1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
+2. User (Autocomplete) **Required** - The user or role to delete.
 
 ## Method: List Databases
 List all databases in the connected MySQL server.
