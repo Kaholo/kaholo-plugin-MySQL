@@ -1,5 +1,5 @@
 const parsers = require("./parsers");
-const MySQLService = require('./mySqlService');
+const MySQLService = require('./mysql.service');
 
 // auto complete helper methods
 

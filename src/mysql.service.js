@@ -1,34 +1,18 @@
 var mysql = require("mysql");
 const fs = require("fs");
 const {removeUndefinedAndEmpty} = require('./helpers');
+const { promisify } = require('util');
+
+const asyncFuncs = ["connect", "end", "query", "beginTransaction", "commit", "rollback"]
 
 module.exports = class MySQLService{
-    constructor({host, user, password, database, port}){
-        if (!host || !user || !password) throw "Didn't provide all required authentication information in connection string";
-        this.connectionOpts = removeUndefinedAndEmpty({host, user, password, database, port});
-    }
-
-    async connect(){
-        this.connection = mysql.createConnection(this.connectionOpts);
-        const context = this;
-        return new Promise(function(resolve, reject) {
-            context.connection.connect(function(err) {
-                if (err) return reject(`Error Connecting: ${err.message || JSON.stringify(err)}`);
-                return resolve(true);
-            });
-        });
-    }
-
-    async disconnect(){
-        const context = this;
-        if (!this.connection) throw "Must connect first!";
-        const result = await (new Promise(function(resolve, reject) {
-            context.connection.end(function(err) {
-                if (err) return reject(`Error Disconnecting: ${err.message || JSON.stringify(err)}`);
-                return resolve(true);
-            });
-        }));
-        return result;
+    constructor(conOpts){
+        if (!conOpts) throw "Connection string not provided!";
+        if (!conOpts.host || !conOpts.user || !conOpts.password) throw "Didn't provide all required authentication information in connection string";
+        this.connection = mysql.createConnection(removeUndefinedAndEmpty(conOpts));
+        for (const func of asyncFuncs){
+            this[func] = promisify(this.connection[func]).bind(this.connection);
+        }
     }
 
     static buildSqlCommand(baseCmd, filters, orderBy){
@@ -40,17 +24,16 @@ module.exports = class MySQLService{
     async executeQuery({query}, dontConnect=false) {
         if (!query) throw "Must provide query to execute!";
         if (!dontConnect) await this.connect();
-        const context = this;
-        const execPromise = new Promise((resolve, reject) => context.connection.query(query, function(err, result) {
-            if (err) return reject(`Error executing query: ${err.message || JSON.stringify(err)}`);
-            return resolve(result);
-        }));
-        const result = await execPromise;
-        if (!dontConnect) {
-            try{ await this.disconnect(); }
-            catch(error){ throw {error, result}; }
+        try {
+            const result = await this.query(query);
+            return result;
         }
-        return result;
+        catch (error) {
+            throw `Error executing query: ${error.message || JSON.stringify(error)}`
+        }
+        finally {
+            if (!dontConnect) await this.end();
+        }
     }
 
     async executeSQLFile({path}) {
@@ -63,7 +46,7 @@ module.exports = class MySQLService{
 
     async testConnectivity(){
         await this.connect();
-        await this.disconnect();
+        await this.end();
         return "Connected!";
     }
 
@@ -101,7 +84,8 @@ module.exports = class MySQLService{
     }
 
     async createUser({user, pass, changePass, role, db, table, scope}){
-        if (scope) await this.connect(); // if should grant permissions - than handle connection
+        if (!user || !pass) throw "Must provide user to create and it's password";
+        if (scope) await this.connect();
         const result = {createUser: await this.executeQuery({
             query: `CREATE USER '${user}'@'localhost'
                     IDENTIFIED BY '${pass}'${changePass ? " PASSWORD EXPIRE" : ""}${role ?
@@ -111,11 +95,12 @@ module.exports = class MySQLService{
         try {
             result.grantPermissions = await this.grantPermissions({user, db, table, scope}, true);
         }
-        catch (err) {
-            throw {...result, err};
+        catch (error) {
+            await this.deleteUser({user}, true);
+            throw `Failed to grant permissions for the new user: ${error.message || JSON.stringify(error)}`;
         }
         finally {
-            await this.disconnect();
+            await this.end();
         }
         return result;
     }
@@ -128,29 +113,31 @@ module.exports = class MySQLService{
         return this.executeQuery({
             query: `GRANT ${role ? `'${role}'` : scope == "full" ? "ALL PRIVILEGES" :
                 scope == "readWrite" ? "INSERT, DELETE, UPDATE, SELECT" : 
-                scope == "write" ? "INSERT, DELETE, UPDATE" : "SELECT"} ON ${db}.${table} TO '${user}'@'localhost'`
+                scope == "write" ? "INSERT, DELETE, UPDATE" : "SELECT"} ON ${db}.${table} TO '${user}'@'localhost';`
         }, dontConnect);
     }
 
     async createRole({role, db, table, scope}){
-        if (!role) throw "Must provide role name!"; 
-        if (!scope && (db || table)) throw "Must provide permission scope!";
-        if (!db && table) throw "If provided specific table, must specify the db it's in";
-        table = table || "*"; db = db || "*";
-        
-        await this.connect();
-        const result = {};
+        if (!role) throw "Must provide role name!";
+        if (scope) await this.connect();
+        const result = {createRole: await this.executeQuery({query: `CREATE ROLE '${role}'@'localhost';`}, scope)};
+        if (!scope) return result;
         try {
-            result.createRole = await this.executeQuery({query: `CREATE ROLE '${role}'@'localhost';`}, true);
-            if (scope) result.grantPermissions = await this.grantPermissions({user: role, db, table, scope}, true);
+            result.grantPermissions = await this.grantPermissions({user: role, db, table, scope}, true);
         }
         catch (error) {
-            throw {...result, error};
+            await this.deleteUser({user: role}, true);
+            throw `Failed to grant permissions for the new role: ${error.message || JSON.stringify(error)}`;
         }
         finally {
-            await this.disconnect();
+            await this.end();
         }
         return result;
+    }
+
+    async deleteUser({user}, dontConnect){
+        if (!user) throw "Must provide user to delete";
+        return this.executeQuery({query: `DROP USER '${user}'@'localhost'`}, dontConnect);
     }
     
     async listDbs({query}){

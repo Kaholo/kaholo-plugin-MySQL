@@ -1,4 +1,4 @@
-const MySQLService = require('./mySqlService');
+const MySQLService = require('./mysql.service');
 const parsers = require('./parsers');
 
 async function executeQuery(action, settings){
@@ -92,6 +92,14 @@ async function createRole(action, settings){
   });
 }
 
+async function deleteUser(action, settings){
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.deleteUser({
+    user: parsers.autocomplete(action.params.user)
+  });
+}
+
 async function listDbs(action, settings){
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
@@ -129,6 +137,7 @@ module.exports = {
   createUser,
   grantPermissions,
   createRole,
+  deleteUser,
   // list funcs
   listDbs,
   listTables,
