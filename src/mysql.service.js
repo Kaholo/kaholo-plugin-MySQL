@@ -3,12 +3,14 @@ const fs = require("fs");
 const {removeUndefinedAndEmpty} = require('./helpers');
 const { promisify } = require('util');
 
-const asyncFuncs = ["connect", "end", "query", "beginTransaction", "commit", "rollback"]
+const asyncFuncs = ["connect", "end", "query", "beginTransaction", "commit", "rollback"];
+const mysqldump = require('mysqldump').default;
 
 module.exports = class MySQLService{
     constructor(conOpts){
         if (!conOpts) throw "Connection string not provided!";
         if (!conOpts.host || !conOpts.user || !conOpts.password) throw "Didn't provide all required authentication information in connection string";
+        this.conOpts = conOpts;
         this.connection = mysql.createConnection(removeUndefinedAndEmpty(conOpts));
         for (const func of asyncFuncs){
             this[func] = promisify(this.connection[func]).bind(this.connection);
@@ -139,17 +141,85 @@ module.exports = class MySQLService{
         if (!user) throw "Must provide user to delete";
         return this.executeQuery({query: `DROP USER '${user}'@'localhost'`}, dontConnect);
     }
+
+    async copyStructure({srcDb, srcTable, destConStr, destDb, destTable, override}){
+        if (!srcTable || !(destConStr || destDb || destTable)) throw "Didn't provide one of the required parameters.";
+        destTable = destTable || srcTable;
+        const srcConOpts = {...this.conOpts};
+        const destConOpts = {...(destConStr || this.conOpts)};
+        if (srcDb) srcConOpts.database = srcDb;
+        if (destDb) destConOpts.database = destDb;
+        const destService = new MySQLService(destConOpts);
+        await destService.connect();
+        const existingTable = await destService.executeQuery({query: `SHOW TABLES LIKE '${destTable}';`}, true);
+        var dataDump, result = {}, lastAction, tempCreated = false, newTableName;
+        try {
+            if (existingTable && existingTable.length > 0){
+                lastAction = "copy data from old destination table";
+                if (!override) throw `Destination table already exists!
+    Please provide override = true if you want to override the structure of the current table.`;
+                // copy data
+                dataDump = (await mysqldump({
+                    connection: destConOpts,
+                    dump: {
+                        tables: [destTable],
+                        data: {
+                            verbose: false,
+                            maxRowsPerInsertStatement: 1000000
+                        },
+                        schema: false,
+                        trigger: false
+                    }
+                })).dump.data.split("\n").filter(line => !line.startsWith("#")).join("\n");
+                newTableName = `${destTable}_temp`;
+                dataDump = dataDump.replace(new RegExp(`\`${destTable}\``, "g"), `\`${newTableName}\``);
+            }
+            else newTableName = destTable;
+            lastAction = "copy source table structure";
+            var tableDump = (await mysqldump({
+                connection: srcConOpts,
+                dump: {
+                    tables: [srcTable],
+                    data: false,
+                    trigger: false
+                }
+            })).dump.schema.split("\n").filter(line => !line.startsWith("#")).join("\n");
+            tableDump = tableDump.replace(`\`${srcTable}\``, `\`${newTableName}\``);
+
+            lastAction = `create new ${dataDump ? "temp " : ""}destination table`;
+            result.createTable = await destService.executeQuery({query: tableDump}, true);
+            tempCreated = true;
+            if (!dataDump) return result; 
+
+            lastAction = "insert data from old destination table to temp table";
+            result.insertData = await destService.executeQuery({query: dataDump}, true);
+
+            lastAction = "drop old destination table";
+            result.dropTable = await destService.executeQuery({query: `DROP TABLE \`${destTable}\`;`}, true);
+
+            lastAction = "rename temp destination table";
+            result.dropTable = await destService.executeQuery({query: `RENAME TABLE \`${newTableName}\` TO \`${destTable}\`;`}, true);
+            return result;
+        }
+        catch (error) {
+            if (tempCreated) result.dropTemp = await destService.executeQuery({query: `DROP TABLE ${newTableName};`}, true);
+            throw `Error when trying to ${lastAction}: ${error.message || JSON.stringify(error)}`;
+        }
+        finally {
+            await destService.end();
+        }
+    }
     
-    async listDbs({query}){
+    async listDbs(){
         return this.executeQuery({
-            query: `SHOW DATABASES${query ? ` LIKE '%${query}%'` : ""}`
+            query: `SHOW DATABASES`
         });
     }
     
-    async listTables({db, query}){
+    async listTables({db}){
         return this.executeQuery({
             query: `SELECT table_schema 'database', table_name 'table'
-                    FROM information_schema.tables WHERE table_type = 'BASE TABLE'${query ? ` AND table_name LIKE '%${query}%'` : ""}
+                    FROM information_schema.tables WHERE table_type = 'BASE TABLE'
                         AND table_schema ${db && db != "*" ? `='${db}'` : "not in ('information_schema','mysql','performance_schema','sys')"}
                     ORDER BY table_schema, table_name;`
         });

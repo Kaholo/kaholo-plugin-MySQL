@@ -4,7 +4,7 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "3.0.2",
+  "version": "3.0.4",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
@@ -336,6 +336,53 @@
           "type": "autocomplete",
           "autocompleteType":"function",
           "functionName":"listUsersAuto"
+        }
+      ]
+    },
+    {
+      "name": "copyStructure",
+      "viewName": "Copy Table Structure",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Source Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "srcDb",
+          "viewName": "Source DB",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesAuto"
+        },
+        {
+          "name": "srcTable",
+          "viewName": "Source Table",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesAuto"
+        },
+        {
+          "name": "destConStr",
+          "viewName": "Destination Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "destDb",
+          "viewName": "Destination DB",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesAuto"
+        },
+        {
+          "name": "destTable",
+          "viewName": "Destination Table Name",
+          "type": "string"
+        },
+        {
+          "name": "override",
+          "viewName": "Override Destination Table",
+          "type": "boolean"
         }
       ]
     },

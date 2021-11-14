@@ -100,6 +100,19 @@ async function deleteUser(action, settings){
   });
 }
 
+async function copyStructure(action, settings){
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.copyStructure({
+    srcDb: parsers.autocomplete(action.params.srcDb),
+    srcTable: parsers.autocomplete(action.params.srcTable),
+    destConStr: parsers.mySqlConStr(action.params.destConStr),
+    destDb: parsers.autocomplete(action.params.destDb),
+    destTable: parsers.autocomplete(action.params.destTable),
+    override: parsers.boolean(action.params.override)
+  });
+}
+
 async function listDbs(action, settings){
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
@@ -138,6 +151,7 @@ module.exports = {
   grantPermissions,
   createRole,
   deleteUser,
+  copyStructure,
   // list funcs
   listDbs,
   listTables,
