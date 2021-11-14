@@ -112,6 +112,21 @@ Delete the specified user(can also be a role).
 1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
 2. User (Autocomplete) **Required** - The user or role to delete.
 
+## Method: Copy Table Structure
+Copy a table schema only(with no data inside) from the specified database and table to the specified destination database and table name.
+If destination table already exists in the destination database, create a new temporary table with "_temp" suffix to the name specified, than try to copy old data from old destination table to the new temp table. Afterwards if copy was successful, delete the old destination table and rename the temporary table to be the new destination table. If fails in any step other than renaming the temporary table, will rollback any changes done in this action. If fails in renaming the temporary table won't be able to rollback any changes.
+
+### Parameters
+1. Source Connection String (Vault) **Required if not in settings** - The connection string to use to connect to the MySQL server containing the source table. Will use the value specified in the settings if not specified.
+2. Source Database (Autocomplete) **Optional** - The name of the database containing the source schema to be copied. If not specified will use the database specified in the connection string or the default database of the server.
+3. Source Table (Autocomplete) **Required** - The name of the source table to copy it's schema.
+4. Destination Connection String (Vault) **Required if not specified params 5 or 6** - The connection string to use to connect to the MySQL server to copt the schema into. Will use Source Connection String if not specified.
+5. Destination Database (Autocomplete) **Required if not specified params 4 or 6** - The name of the database containing the source schema to be copied. If not specified will use the database specified in the connection string or the default database of the server.
+6. Destination Table (Autocomplete) **Required if not specified params 4 or 5** - The name of the new table to copy the source schema into.
+* **Must provide at least one of the parameters 4, 5, or 6**
+7. Override Destination Table (Autocomplete) **Optional** - If false and destination table already exists, throw an error. If true and the destination table aleady exists, try to copy all data from it to a temporary table with the new schema, and than drop the original table and rename the temporary table to be the new destination table.
+
+
 ## Method: List Databases
 List all databases in the connected MySQL server.
 
