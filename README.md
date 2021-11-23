@@ -22,6 +22,15 @@ Execute the SQL file in the specified path.
 1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
 2. SQL File Path (String) **Required** - The path to the SQL script file to execute.
 
+## Method: Insert Data To Table
+Insert all provided data to the specified table. Data is passed in the format of an array of objects, with matching fields names to the inserted table.
+
+### Parameters
+1. Connection String (Vault) **Required if not in settings** - The connection string to use on to connect to the MySQL server. The format of the connection string is specified in the settings.
+2. Database (Autocomplete) **Optional** - If specified, filter tables in the next param to only be from the specified db. Default value is the database in the connection string or the server's default db.
+3. Table (Autocomplete) **Required** - The table to insert the data into.
+4. Data (Array Of Objects) **Required** - The data to insert into the specified table. Should be passed in the format of an array of objects with matching fields to the specified table.
+
 ## Method: Test Connectivity
 Test if able to connect to the specified connection string.
 

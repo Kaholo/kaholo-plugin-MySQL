@@ -38,6 +38,25 @@ module.exports = class MySQLService{
         }
     }
 
+    async insertData({db, table, data}, dontConnect=false) {
+        if (!table || !data || !data.length) throw "Didn't provide one of the required parameters.";
+        if (!dontConnect) await this.connect();
+        try {
+            var fields = new Set(); // Set since we don't want duplicate fields, but not all objects necessarily has all fields
+            data.forEach(row => Object.keys(row).forEach(field => fields.add(field)));
+            fields = Array.from(fields);
+            const dataMetrix = data.map(row => fields.map(field => row[field]));
+            const result = await this.query(`INSERT INTO ${db || "dbo"}.${table} (${fields.join(", ")}) VALUES ?`, [dataMetrix]);
+            return result;
+        }
+        catch (error) {
+            throw `Error inserting data: ${error.message || JSON.stringify(error)}`
+        }
+        finally {
+            if (!dontConnect) await this.end();
+        }
+    }
+
     async executeSQLFile({path}) {
         if (!path) throw "Must provide SQL query file to execute!";
         if (!fs.existsSync(path)) throw `Couldn't find file: ${path}`;

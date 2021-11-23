@@ -4,7 +4,7 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
@@ -43,6 +43,37 @@
           "name": "path",
           "viewName": "SQL File Path",
           "type": "string"
+        }
+      ]
+    },{
+      "name": "insertData",
+      "viewName": "Insert Data To Table",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault"
+        },
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listDatabasesAuto"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType":"function",
+          "functionName":"listTablesAuto",
+          "description": "The table to insert data into."
+        },
+        {
+          "name": "data",
+          "viewName": "Data",
+          "type": "string",
+          "description": "An array of objects to insert into the table. All objects fields should have matching names to the table fields."
         }
       ]
     },
