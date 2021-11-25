@@ -101,5 +101,18 @@ module.exports = {
         else path = path.replace(/\\/g, '/');
         return normalize(untildify(path));
     },
-    array: parseArray
+    array: parseArray,
+    arrayOfObjects: (value)=>{
+        if (!value) return undefined;
+        if (Array.isArray(value)) {
+            if (!value.every(item => typeof(item) === 'object')){
+                throw "Bad Data Format. All items in array must be objects.";
+            }
+            return value;
+        }
+        if (typeof value === 'object'){
+            return [value];
+        }
+        throw "Unsupported Data Format"
+    }
 }

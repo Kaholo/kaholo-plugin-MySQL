@@ -17,6 +17,16 @@ async function executeSQLFile(action, settings){
   });
 }
 
+async function insertData(action, settings){
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.insertData({
+    db: parsers.autocomplete(action.params.db),
+    table: parsers.autocomplete(action.params.table),
+    data: parsers.arrayOfObjects(action.params.data)
+  });
+}
+
 async function testConnectivity(action, settings){
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
@@ -142,6 +152,7 @@ async function listTables(action, settings){
 module.exports = {
   executeQuery,
   executeSQLFile,
+  insertData,
   testConnectivity,
   getTablesLockedStatus,
   getServerVersion,
