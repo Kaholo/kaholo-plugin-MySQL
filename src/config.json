@@ -4,7 +4,7 @@
   "imgUrl": "MySQL.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "3.0.6",
+  "version": "3.0.8",
   "description": "Run sql commands and scripts on MySQL servers.",
   "settings": [
     {
@@ -615,5 +615,6 @@
         }
       ]
     }
-  ]
+  ],
+  "category": "DATABASE"
 }
