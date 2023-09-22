@@ -1,7 +1,7 @@
 {
   "name": "MySQL",
   "type": "executer",
-  "imgUrl": "MySQL.png",
+  "imgUrl": "logo.png",
   "execProgram": "node",
   "main": "app.js",
   "version": "3.0.8",
