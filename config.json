@@ -6,6 +6,19 @@
   "main": "app.js",
   "version": "3.0.8",
   "description": "Run sql commands and scripts on MySQL servers.",
+  "category": "Database",
+  "keywords": [
+    "mysql",
+    "mysqldump",
+    "mysqladmin",
+    "sql",
+    "database",
+    "cli",
+    "mariadb",
+    "dump",
+    "restore",
+    "query"
+  ],
   "settings": [
     {
       "name": "conStr",
@@ -615,6 +628,5 @@
         }
       ]
     }
-  ],
-  "category": "DATABASE"
+  ]
 }
