@@ -1,5 +1,6 @@
 const MySQLService = require("./mysql.service");
 const parsers = require("./parsers");
+const autocomplete = require("./autocomplete");
 
 async function executeQuery(action, settings) {
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
@@ -169,5 +170,5 @@ module.exports = {
   listRoles,
   listUsers,
   // autocomplete methods
-  ...require("./autocomplete"),
+  ...autocomplete,
 };
