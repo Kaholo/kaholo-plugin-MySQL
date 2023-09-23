@@ -16,11 +16,11 @@ function mapAutoParams(autoParams) {
 /** *
  * @returns {[{id, value}]} filtered result items
  ** */
-function handleResult(result, query, keyField, valField) {
-  if (!result || result.length == 0) {
+function handleResult(result, query, k, v) {
+  if (!result || result.length === 0) {
     return [];
   }
-  const items = result.map((item) => getAutoResult(item[keyField], item[valField])).filter((item) => item.value);
+  const items = result.map((item) => getAutoResult(item[k], item[v])).filter((item) => item.value);
   return filterItems(items, query);
 }
 
@@ -32,12 +32,14 @@ function getAutoResult(id, value) {
 }
 
 function filterItems(items, query) {
+  let sItems = items;
   if (query) {
-    const qWords = query.split(/[. ]/g).filter((word) => word).map((word) => word.toLowerCase()); // split by '.' or ' ' and make lower case
-    items = items.filter((item) => qWords.every((word) => item.value.toLowerCase().includes(word)));
-    items = items.sort((word1, word2) => word1.value.toLowerCase().indexOf(qWords[0]) - word2.value.toLowerCase().indexOf(qWords[0]));
+    // split by '.' or ' ' and make lower case
+    const qWords = query.split(/[. ]/g).filter((word) => word).map((word) => word.toLowerCase());
+    const fItems = items.filter((item) => qWords.every((word) => item.value.toLowerCase().includes(word)));
+    sItems = fItems.sort((word1, word2) => word1.value.toLowerCase().indexOf(qWords[0]) - word2.value.toLowerCase().indexOf(qWords[0]));
   }
-  return items.splice(0, MAX_RESULTS);
+  return sItems.splice(0, MAX_RESULTS);
 }
 
 function listAuto(listFuncName, fields, addAllOption) {
