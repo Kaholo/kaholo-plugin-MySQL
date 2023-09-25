@@ -26,7 +26,7 @@ module.exports = class MySQLService {
 
   static buildSqlCommand(baseCmd, filters, orderBy) {
     return `${baseCmd}${filters && filters.length ? `
-                WHERE ${filters.map(([name, val]) => `${name} = '${val}`).join(" AND ")}'` : ""}${orderBy && orderBy.length ? `
+                WHERE ${filters.map(([name, val]) => `${name} = '${val}'`).join(" AND ")}` : ""}${orderBy && orderBy.length ? `
                 ORDER BY ${orderBy.map(([name, val]) => `${name}${val ? ` ${val}` : ""}`).join(", ")}` : ""}`;
   }
 
@@ -109,7 +109,7 @@ module.exports = class MySQLService {
       query: `SELECT table_schema 'database',
                     ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) 'sizeInMb' 
                     FROM information_schema.tables 
-                    ${db && db !== "*" ? `WHERE table_schema='${db}'` : ""} GROUP BY table_schema`
+                    ${db && db !== "*" ? `WHERE table_schema='${db}'` : ""} GROUP BY table_schema`,
     });
   }
 
