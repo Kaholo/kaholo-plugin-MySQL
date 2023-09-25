@@ -34,6 +34,7 @@ module.exports = class MySQLService {
     if (!query) {
       throw new Error("Must provide query to execute!");
     }
+    console.error(`\nTHE QUERY IS: ${query}\n`)
     if (!dontConnect) {
       await this.connect();
     }
@@ -108,8 +109,7 @@ module.exports = class MySQLService {
       query: `SELECT table_schema 'database',
                     ROUND(SUM(data_length + index_length) / 1024 / 1024, 1) 'sizeInMb' 
                     FROM information_schema.tables 
-                    GROUP BY table_schema${db && db !== "*" ? `
-                    WHERE table_schema='${db}'` : ""}`,
+                    ${db && db !== "*" ? `WHERE table_schema='${db}'` : ""} GROUP BY table_schema`
     });
   }
 
