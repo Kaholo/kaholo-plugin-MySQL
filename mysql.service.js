@@ -1,24 +1,27 @@
 const mysql = require("mysql");
 const fs = require("fs");
-const { removeUndefinedAndEmpty } = require("./helpers");
+const mysqldump = require("mysqldump").default;
 const { promisify } = require("util");
+const { removeUndefinedAndEmpty } = require("./helpers");
 
 const asyncFuncs = ["connect", "end", "query", "beginTransaction", "commit", "rollback"];
-const mysqldump = require("mysqldump").default;
 
 module.exports = class MySQLService {
   constructor(conOpts) {
     if (!conOpts) {
-      throw "Connection string not provided!";
+      throw new Error("Connection string not provided!");
     }
     if (!conOpts.host || !conOpts.user || !conOpts.password) {
-      throw "Didn't provide all required authentication information in connection string";
+      throw new Error("Didn't provide all required authentication information in connection string");
     }
     this.conOpts = conOpts;
     this.connection = mysql.createConnection(removeUndefinedAndEmpty(conOpts));
-    for (const func of asyncFuncs) {
+    // for (const func of asyncFuncs) {
+    //   this[func] = promisify(this.connection[func]).bind(this.connection);
+    // }
+    asyncFuncs.forEach((func) => {
       this[func] = promisify(this.connection[func]).bind(this.connection);
-    }
+    });
   }
 
   static buildSqlCommand(baseCmd, filters, orderBy) {
@@ -29,7 +32,7 @@ module.exports = class MySQLService {
 
   async executeQuery({ query }, dontConnect = false) {
     if (!query) {
-      throw "Must provide query to execute!";
+      throw new Error("Must provide query to execute!");
     }
     if (!dontConnect) {
       await this.connect();
@@ -38,7 +41,7 @@ module.exports = class MySQLService {
       const result = await this.query(query);
       return result;
     } catch (error) {
-      throw `Error executing query: ${error.message || JSON.stringify(error)}`;
+      throw new Error(`Error executing query: ${error.message || JSON.stringify(error)}`);
     } finally {
       if (!dontConnect) {
         await this.end();
@@ -48,20 +51,21 @@ module.exports = class MySQLService {
 
   async insertData({ db, table, data }, dontConnect = false) {
     if (!table || !data || !data.length) {
-      throw "Didn't provide one of the required parameters.";
+      throw new Error("Didn't provide one of the required parameters.");
     }
     if (!dontConnect) {
       await this.connect();
     }
     try {
-      let fields = new Set(); // Set since we don't want duplicate fields, but not all objects necessarily has all fields
+      // Set since we don't want duplicate fields, but not all objects necessarily has all fields
+      let fields = new Set();
       data.forEach((row) => Object.keys(row).forEach((field) => fields.add(field)));
       fields = Array.from(fields);
       const dataMetrix = data.map((row) => fields.map((field) => row[field]));
       const result = await this.query(`INSERT INTO ${db || "dbo"}.${table} (${fields.join(", ")}) VALUES ?`, [dataMetrix]);
       return result;
     } catch (error) {
-      throw `Error inserting data: ${error.message || JSON.stringify(error)}`;
+      throw new Error(`Error inserting data: ${error.message || JSON.stringify(error)}`);
     } finally {
       if (!dontConnect) {
         await this.end();
@@ -71,10 +75,10 @@ module.exports = class MySQLService {
 
   async executeSQLFile({ path }) {
     if (!path) {
-      throw "Must provide SQL query file to execute!";
+      throw new Error("Must provide SQL query file to execute!");
     }
     if (!fs.existsSync(path)) {
-      throw `Couldn't find file: ${path}`;
+      throw new Error(`Couldn't find file: ${path}`);
     }
     return this.executeQuery({
       query: fs.readFileSync(path, "utf8"),
@@ -127,7 +131,7 @@ module.exports = class MySQLService {
     user, pass, changePass, role, db, table, scope,
   }) {
     if (!user || !pass) {
-      throw "Must provide user to create and it's password";
+      throw new Error("Must provide user to create and it's password");
     }
     if (scope) {
       await this.connect();
@@ -148,7 +152,7 @@ module.exports = class MySQLService {
       }, true);
     } catch (error) {
       await this.deleteUser({ user }, true);
-      throw `Failed to grant permissions for the new user: ${error.message || JSON.stringify(error)}`;
+      throw new Error(`Failed to grant permissions for the new user: ${error.message || JSON.stringify(error)}`);
     } finally {
       await this.end();
     }
@@ -156,20 +160,45 @@ module.exports = class MySQLService {
   }
 
   async grantPermissions({
-    user, db, table, scope, role,
+    user,
+    db,
+    table,
+    scope,
+    role,
   }, dontConnect) {
     if (!scope && !role) {
-      throw "Must provide permissions scope!";
+      throw new Error("Must provide permissions scope!");
     }
     if (!db && table) {
-      throw "If provided specific table, must specify the db it's in";
+      throw new Error("If provided specific table, must specify the db it's in");
     }
-    table = table || "*"; db = db || "*";
+    const queryTable = table || "*";
+    const queryDB = db || "*";
+
+    const grantArray = ["GRANT"];
+    if (role) {
+      grantArray.push(`'${role}'`);
+    } else {
+      switch (scope) {
+        case "full":
+          grantArray.push("ALL PRIVILEGES");
+          break;
+        case "readWrite":
+          grantArray.push("INSERT, DELETE, UPDATE, SELECT");
+          break;
+        case "write":
+          grantArray.push("INSERT, DELETE, UPDATE");
+          break;
+        default:
+          grantArray.push("SELECT");
+      }
+    }
+
+    grantArray.push(`ON ${queryDB}.${queryTable} TO '${user}'@'localhost';`);
+    const grantString = grantArray.join(" ");
 
     return this.executeQuery({
-      query: `GRANT ${role ? `'${role}'` : scope == "full" ? "ALL PRIVILEGES"
-        : scope == "readWrite" ? "INSERT, DELETE, UPDATE, SELECT"
-          : scope == "write" ? "INSERT, DELETE, UPDATE" : "SELECT"} ON ${db}.${table} TO '${user}'@'localhost';`,
+      query: grantString,
     }, dontConnect);
   }
 
@@ -177,7 +206,7 @@ module.exports = class MySQLService {
     role, db, table, scope,
   }) {
     if (!role) {
-      throw "Must provide role name!";
+      throw new Error("Must provide role name!");
     }
     if (scope) {
       await this.connect();
@@ -192,7 +221,7 @@ module.exports = class MySQLService {
       }, true);
     } catch (error) {
       await this.deleteUser({ user: role }, true);
-      throw `Failed to grant permissions for the new role: ${error.message || JSON.stringify(error)}`;
+      throw new Error(`Failed to grant permissions for the new role: ${error.message || JSON.stringify(error)}`);
     } finally {
       await this.end();
     }
@@ -201,7 +230,7 @@ module.exports = class MySQLService {
 
   async deleteUser({ user }, dontConnect) {
     if (!user) {
-      throw "Must provide user to delete";
+      throw new Error("Must provide user to delete");
     }
     return this.executeQuery({ query: `DROP USER '${user}'@'localhost'` }, dontConnect);
   }
@@ -209,10 +238,9 @@ module.exports = class MySQLService {
   async copyStructure({
     srcDb, srcTable, destConStr, destDb, destTable, override,
   }) {
-    if (!srcTable || !(destConStr || destDb || destTable)) {
-      throw "Didn't provide one of the required parameters.";
+    if (!(srcTable && destConStr && destDb && destTable)) {
+      throw new Error("Didn't provide one of the required parameters.");
     }
-    destTable = destTable || srcTable;
     const srcConOpts = { ...this.conOpts };
     const destConOpts = { ...(destConStr || this.conOpts) };
     if (srcDb) {
@@ -230,8 +258,8 @@ module.exports = class MySQLService {
       if (existingTable && existingTable.length > 0) {
         lastAction = "copy data from old destination table";
         if (!override) {
-          throw `Destination table already exists!
-    Please provide override = true if you want to override the structure of the current table.`;
+          throw new Error(`Destination table already exists!
+    Please provide override = true if you want to override the structure of the current table.`);
         }
         // copy data
         dataDump = (await mysqldump({
@@ -282,7 +310,7 @@ module.exports = class MySQLService {
       if (tempCreated) {
         result.dropTemp = await destService.executeQuery({ query: `DROP TABLE ${newTableName};` }, true);
       }
-      throw `Error when trying to ${lastAction}: ${error.message || JSON.stringify(error)}`;
+      throw new Error(`Error when trying to ${lastAction}: ${error.message || JSON.stringify(error)}`);
     } finally {
       await destService.end();
     }
@@ -298,7 +326,7 @@ module.exports = class MySQLService {
     return this.executeQuery({
       query: `SELECT table_schema 'database', table_name 'table'
                     FROM information_schema.tables WHERE table_type = 'BASE TABLE'
-                        AND table_schema ${db && db != "*" ? `='${db}'` : "not in ('information_schema','mysql','performance_schema','sys')"}
+                        AND table_schema ${db && db !== "*" ? `='${db}'` : "not in ('information_schema','mysql','performance_schema','sys')"}
                     ORDER BY table_schema, table_name;`,
     });
   }

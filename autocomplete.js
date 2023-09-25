@@ -36,8 +36,12 @@ function filterItems(items, query) {
   if (query) {
     // split by '.' or ' ' and make lower case
     const qWords = query.split(/[. ]/g).filter((word) => word).map((word) => word.toLowerCase());
-    const fItems = items.filter((item) => qWords.every((word) => item.value.toLowerCase().includes(word)));
-    sItems = fItems.sort((word1, word2) => word1.value.toLowerCase().indexOf(qWords[0]) - word2.value.toLowerCase().indexOf(qWords[0]));
+    const fItems = items.filter(
+      (item) => qWords.every((word) => item.value.toLowerCase().includes(word)),
+    );
+    sItems = fItems.sort(
+      (word1, word2) => word1.value.indexOf(qWords[0]) - word2.value.indexOf(qWords[0]),
+    );
   }
   return sItems.splice(0, MAX_RESULTS);
 }

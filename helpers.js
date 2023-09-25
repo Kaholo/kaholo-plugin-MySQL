@@ -1,4 +1,5 @@
-function removeUndefinedAndEmpty(obj, removeSpecial) {
+function removeUndefinedAndEmpty(passedObj, removeSpecial) {
+  const obj = passedObj;
   Object.entries(obj).forEach(([key, value]) => {
     if (key === "auth") {
       return;

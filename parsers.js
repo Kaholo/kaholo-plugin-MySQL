@@ -1,7 +1,7 @@
 const os = require("os");
 
 const homeDirectory = os.homedir();
-const isWin = os.platform() == "win32";
+const isWin = os.platform() === "win32";
 const { normalize } = require("path");
 
 function untildify(path) {
@@ -18,7 +18,7 @@ function parseArray(value) {
   if (typeof (value) === "string") {
     return value.split("\n").map((line) => line.trim()).filter((line) => line);
   }
-  throw "Unsupprted array format";
+  throw new Error("Unsupprted array format");
 }
 
 module.exports = {
@@ -38,9 +38,9 @@ module.exports = {
     if (!value) {
       return undefined;
     }
-    const parsed = parseInt(value);
-    if (parsed === NaN) {
-      throw `Value ${value} is not a valid number`;
+    const parsed = parseInt(value, 10);
+    if (Number.isNaN(parsed)) {
+      throw new Error(`Value ${value} is not a valid number`);
     }
     return parsed;
   },
@@ -65,30 +65,6 @@ module.exports = {
     }
     return [value];
   },
-  object: (value) => {
-    if (!value) {
-      return undefined;
-    }
-    if (typeof (value) === "object") {
-      return value;
-    }
-    if (typeof (value) === "string") {
-      try {
-        return JSON.parse(value);
-      } catch (e) {}
-      return value.split("\n").reduce((prev, cur) => {
-        let [key, ...val] = cur.trim().split("=");
-        if (!key || !val) {
-          throw "bad object format";
-        }
-        if (Array.isArray(val)) {
-          val = val.join("=");
-        }
-        prev[key] = val;
-      }, {});
-    }
-    throw `Value ${value} is not an object`;
-  },
   string: (value) => {
     if (!value) {
       return undefined;
@@ -96,7 +72,7 @@ module.exports = {
     if (typeof (value) === "string") {
       return value.trim();
     }
-    throw `Value ${value} is not a valid string`;
+    throw new Error(`Value ${value} is not a valid string`);
   },
   mySqlConStr: (value) => {
     if (!value) {
@@ -105,15 +81,15 @@ module.exports = {
     if (typeof (value) === "object") {
       return value;
     }
-    if (!typeof (value) === "string") {
-      throw "Bad MySQL connection string format";
+    if (typeof (value) !== "string") {
+      throw new Error("Bad MySQL connection string format");
     }
-    value = value.trim();
+    const trimmedValue = value.trim();
     let opts = {};
-    const matches = value.match(/^mysql:\/\/(\w+):(.+)@([a-zA-Z]\w*|\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}):?(\d+)?\/?(\w+)?/g);
+    const matches = trimmedValue.match(/^mysql:\/\/(\w+):(.+)@([a-zA-Z]\w*|\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}):?(\d+)?\/?(\w+)?/g);
     if (matches && matches.length) {
       opts = { user: matches[0], password: matches[1], host: matches[2] };
-      for (let i = 0; i < matches.length; i++) {
+      for (let i = 0; i < matches.length; i += 1) {
         if (matches[i].startswith(":")) {
           opts.port = module.exports.number(matches[i].slice(1));
         }
@@ -125,17 +101,17 @@ module.exports = {
       const params = value.split(/[;\n]/g);
       const translateKeyMap = { pwd: "password", server: "host", uid: "user" };
       params.forEach((line) => {
-        line = line.trim();
-        if (!line) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) {
           return;
         }
-        let [key, ...val] = line.split("=");
+        const [key, ...val] = trimmedLine.split("=");
         if (!key || val.length === 0) {
-          throw "Bad MySQL connection string format.";
+          throw new Error("Bad MySQL connection string format.");
         }
-        key = key.trimEnd().toLowerCase(); // key is already trimmed from left
+        const tlckey = key.trimEnd().toLowerCase(); // key is already trimmed from left
 
-        opts[translateKeyMap[key] || key] = val.join("=").trimStart(); // value is already trimmed from right
+        opts[translateKeyMap[tlckey] || tlckey] = val.join("=").trimStart(); // value is already trimmed from right
       });
     }
     return opts;
@@ -159,13 +135,13 @@ module.exports = {
     }
     if (Array.isArray(value)) {
       if (!value.every((item) => typeof (item) === "object")) {
-        throw "Bad Data Format. All items in array must be objects.";
+        throw new Error("Bad Data Format. All items in array must be objects.");
       }
       return value;
     }
     if (typeof value === "object") {
       return [value];
     }
-    throw "Unsupported Data Format";
+    throw new Error("Unsupported Data Format");
   },
 };
