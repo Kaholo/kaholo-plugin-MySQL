@@ -111,6 +111,14 @@ async function deleteUser(action, settings) {
   });
 }
 
+async function deleteRole(action, settings) {
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.deleteRole({
+    role: parsers.autocomplete(action.params.role),
+  });
+}
+
 async function copyStructure(action, settings) {
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
@@ -163,6 +171,7 @@ module.exports = {
   grantPermissions,
   createRole,
   deleteUser,
+  deleteRole,
   copyStructure,
   // list funcs
   listDbs,

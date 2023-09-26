@@ -498,6 +498,30 @@
       ]
     },
     {
+      "name": "deleteRole",
+      "viewName": "Delete Role",
+      "params": [
+        {
+          "name": "conStr",
+          "viewName": "Connection String",
+          "type": "vault",
+          "description": "The connection string to connect to the configured MYSQL database.",
+          "placeholder": "Select or create vault item",
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+        },
+        {
+          "name": "role",
+          "viewName": "Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listRolesAuto",
+          "description": "The role to delete",
+          "placeholder": "Please select a role",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
       "name": "copyStructure",
       "viewName": "Copy Table Structure",
       "params": [

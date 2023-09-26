@@ -169,17 +169,15 @@ module.exports = class MySQLService {
     if (!scope && !role) {
       throw new Error("Must provide permissions scope!");
     }
-    if (!db && table) {
-      throw new Error("If provided specific table, must specify the db it's in");
-    }
-    const queryTable = table || "*";
-    const queryDB = db || "*";
 
     const grantArray = ["GRANT"];
     if (role) {
       grantArray.push(`'${role}'`);
     } else {
-      switch (scope) {
+      if (table && !db) {
+        throw new Error("If specifying a table, specifying database is also required.");
+      }
+        switch (scope) {
         case "full":
           grantArray.push("ALL PRIVILEGES");
           break;
@@ -192,9 +190,11 @@ module.exports = class MySQLService {
         default:
           grantArray.push("SELECT");
       }
+      const queryTable = table || "*";
+      const queryDB = db || "*";
+      grantArray.push(`ON ${queryDB}.${queryTable}`);
     }
-
-    grantArray.push(`ON ${queryDB}.${queryTable} TO '${user}'@'localhost';`);
+    grantArray.push(`TO '${user}'@'localhost';`);
     const grantString = grantArray.join(" ");
 
     return this.executeQuery({
@@ -211,7 +211,7 @@ module.exports = class MySQLService {
     if (scope) {
       await this.connect();
     }
-    const result = { createRole: await this.executeQuery({ query: `CREATE ROLE '${role}'@'localhost';` }, scope) };
+    const result = { createRole: await this.executeQuery({ query: `CREATE ROLE '${role}';` }, scope) };
     if (!scope) {
       return result;
     }
@@ -233,6 +233,13 @@ module.exports = class MySQLService {
       throw new Error("Must provide user to delete");
     }
     return this.executeQuery({ query: `DROP USER '${user}'@'localhost'` }, dontConnect);
+  }
+
+  async deleteRole({ role }, dontConnect) {
+    if (!role) {
+      throw new Error("Must select role to delete");
+    }
+    return this.executeQuery({ query: `DROP ROLE ${role}` }, dontConnect);
   }
 
   async copyStructure({
@@ -333,9 +340,9 @@ module.exports = class MySQLService {
 
   async listRoles() {
     return this.executeQuery({
-      query: `SELECT DISTINCT u.User 'roleName'
+      query: `SELECT u.user 'role', u.host 'host', concat('\\'', u.user, '\\'@\\'', u.host, '\\'') 'roleHost'
                     FROM mysql.user u
-                    WHERE u.account_locked='Y' AND u.password_expired='Y' AND u.authentication_string='';`,
+                    WHERE u.account_locked='Y' AND u.password_expired='Y' AND NOT LENGTH(u.authentication_string);`,
     });
   }
 
