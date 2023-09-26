@@ -512,7 +512,7 @@
           "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
         },
         {
-          "name": "srcDb",
+          "name": "db",
           "viewName": "Source DB",
           "type": "autocomplete",
           "autocompleteType": "function",

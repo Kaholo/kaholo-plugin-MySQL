@@ -134,7 +134,7 @@ async function copyStructure(action, settings) {
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
   return mySql.copyStructure({
-    srcDb: parsers.autocomplete(action.params.srcDb),
+    srcDb: parsers.autocomplete(action.params.db),
     srcTable: parsers.autocomplete(action.params.srcTable),
     destConStr: parsers.mySqlConStr(action.params.destConStr),
     destDb: parsers.autocomplete(action.params.destDb),
