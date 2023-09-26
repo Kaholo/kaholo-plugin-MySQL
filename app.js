@@ -85,7 +85,6 @@ async function grantPermissions(action, settings) {
     user: parsers.autocomplete(action.params.user),
     db: parsers.autocomplete(action.params.db),
     table: parsers.autocomplete(action.params.table),
-    role: parsers.autocomplete(action.params.role),
     scope: action.params.scope,
   });
 }

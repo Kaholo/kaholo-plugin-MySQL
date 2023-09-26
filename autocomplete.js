@@ -65,4 +65,5 @@ module.exports = {
   listDatabasesOrAll: listAuto("listDbs", ["Database"], true),
   listTablesAuto: listAuto("listTables", ["table"]),
   listTablesOrAll: listAuto("listTables", ["table"], true),
+  listUsersRolesAuto: listAuto("listUsersRoles", ["userOrRoleHost"]),
 };

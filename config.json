@@ -305,12 +305,13 @@
         },
         {
           "name": "user",
-          "viewName": "User",
+          "viewName": "User or Role",
           "type": "autocomplete",
           "autocompleteType": "function",
-          "functionName": "listUsersAuto",
-          "description": "The user to geant permission to.",
-          "placeholder": "username",
+          "functionName": "listUsersRolesAuto",
+          "description": "The user or role to be granted permissions",
+          "placeholder": "'dbreaders'@'%'",
+          "required": true,
           "learnUrl": "https://dev.mysql.com/doc/"
         },
         {
@@ -337,6 +338,8 @@
           "name": "scope",
           "viewName": "Permission Scope",
           "type": "options",
+          "default": "read",
+          "required": true,
           "options": [
             {
               "id": "read",
@@ -353,20 +356,14 @@
             {
               "id": "full",
               "name": "Full Access"
+            },
+            {
+              "id": "fullWithGrant",
+              "name": "Full Access with Grant Option"
             }
           ],
           "description": "Specify permission access rights to the new user.",
           "placeholder": "Read Only | Write | Read and Write | Full Access",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "role",
-          "viewName": "Role",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listRolesAuto",
-          "description": "Given roles to the new user.",
-          "placeholder": "DBA",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]

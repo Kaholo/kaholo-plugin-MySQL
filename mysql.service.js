@@ -146,44 +146,35 @@ module.exports = class MySQLService {
 
   async grantPermissions({
     user,
-    db,
-    table,
+    db = "*",
+    table = "*",
     scope,
-    role,
   }, dontConnect) {
-    if (!scope && !role) {
-      throw new Error("Must provide permissions scope!");
+    if (db === "*" && table !== "*") {
+      throw new Error("If specifying a table, specifying a database is also required.");
     }
-
     const grantArray = ["GRANT"];
-    if (role) {
-      grantArray.push(`'${role}'`);
-    } else {
-      if (table && !db) {
-        throw new Error("If specifying a table, specifying database is also required.");
-      }
-      switch (scope) {
-        case "full":
-          grantArray.push("ALL PRIVILEGES");
-          break;
-        case "readWrite":
-          grantArray.push("INSERT, DELETE, UPDATE, SELECT");
-          break;
-        case "write":
-          grantArray.push("INSERT, DELETE, UPDATE");
-          break;
-        default:
-          grantArray.push("SELECT");
-      }
-      const queryTable = table || "*";
-      const queryDB = db || "*";
-      grantArray.push(`ON ${queryDB}.${queryTable}`);
+    switch (scope) {
+      case "fullWithGrant":
+      case "full":
+        grantArray.push("ALL PRIVILEGES");
+        break;
+      case "readWrite":
+        grantArray.push("INSERT, DELETE, UPDATE, SELECT");
+        break;
+      case "write":
+        grantArray.push("INSERT, DELETE, UPDATE");
+        break;
+      default:
+        grantArray.push("SELECT");
     }
-    grantArray.push(`TO '${user}'@'localhost';`);
-    const grantString = grantArray.join(" ");
-
+    grantArray.push(`ON ${db}.${table}`);
+    grantArray.push(`TO ${user}`);
+    if (scope === "fullWithGrant") {
+      grantArray.push(`WITH GRANT OPTION`);
+    }
     return this.executeQuery({
-      query: grantString,
+      query: grantArray.join(" "),
     }, dontConnect);
   }
 
@@ -316,4 +307,13 @@ module.exports = class MySQLService {
                     WHERE account_locked = 'N';`
     });
   }
+
+  async listUsersRoles() {
+    return this.executeQuery({
+      query: `SELECT u.user 'userOrRole', u.host 'host', concat('\\'', u.user, '\\'@\\'', u.host, '\\'') 'userOrRoleHost'
+                    FROM mysql.user u
+                    WHERE u.account_locked != 'Y' OR NOT LENGTH(u.authentication_string)`
+    });
+  }
+
 };
