@@ -71,12 +71,10 @@ async function createUser(action, settings) {
   const mySql = new MySQLService(conOpts);
   return mySql.createUser({
     user: parsers.string(action.params.user),
+    host: parsers.string(action.params.host),
     pass: action.params.pass,
-    changePass: parsers.boolean(action.params.changePassrole),
-    role: parsers.autocomplete(action.params.role),
-    db: parsers.autocomplete(action.params.db),
-    table: parsers.autocomplete(action.params.table),
-    scope: action.params.scope,
+    changePass: parsers.boolean(action.params.changePass),
+    role: action.params.role,
   });
 }
 

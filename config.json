@@ -248,8 +248,18 @@
           "name": "user",
           "viewName": "Username",
           "type": "string",
-          "description": "Username to configure.",
+          "description": "Name for new user",
           "placeholder": "username",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "host",
+          "viewName": "Host",
+          "type": "string",
+          "description": "IP or named host from which user may connect, or leave empty for '%' (any host)",
+          "placeholder": "%",
+          "default": "localhost",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
         {
@@ -257,70 +267,26 @@
           "viewName": "Password",
           "type": "vault",
           "description": "Password for the new user.",
-          "placeholder": "password",
+          "placeholder": "Select or create vault item",
+          "required": true,
           "learnUrl": "https://dev.mysql.com/doc/"
         },
         {
           "name": "changePass",
           "viewName": "Change Password On Login",
           "type": "boolean",
+          "default": "false",
           "description": "Change password on initial login.",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
         {
           "name": "role",
-          "viewName": "Role",
+          "viewName": "Default Role",
           "type": "autocomplete",
           "autocompleteType": "function",
           "functionName": "listRolesAuto",
-          "description": "Given roles to the new user.",
-          "placeholder": "DBA",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "db",
-          "viewName": "DB Permission",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listDatabasesOrAll",
-          "description": "Specify permission to a specific database.",
-          "placeholder": "dbname",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "table",
-          "viewName": "Table Permission",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listTablesOrAll",
-          "description": "Specify permission to specific tables.",
-          "placeholder": "tablename",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "scope",
-          "viewName": "Permission Scope",
-          "type": "options",
-          "options": [
-            {
-              "id": "read",
-              "name": "Read Only"
-            },
-            {
-              "id": "write",
-              "name": "Write(Insert/Update/Delete) Only"
-            },
-            {
-              "id": "readWrite",
-              "name": "Read And Write"
-            },
-            {
-              "id": "full",
-              "name": "Full Access"
-            }
-          ],
-          "description": "Specify permission access rights to the new user.",
-          "placeholder": "Read Only | Write | Read and Write",
+          "description": "Optional role to assign as user's default role, leave empty for no default role.",
+          "placeholder": "Select one",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
@@ -513,7 +479,7 @@
           "viewName": "Destination Connection String",
           "type": "vault",
           "description": "The connectiong string of the MySQL server to copy the table structure into.",
-          "placeholder": "Server=myServerAddress;Port=3306;Database=myDataBase;Uid=myUsername;Pwd=myPassword;",
+          "placeholder": "Select or create vault item",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
         {

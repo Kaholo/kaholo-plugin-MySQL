@@ -34,6 +34,7 @@ module.exports = class MySQLService {
     if (!query) {
       throw new Error("Must provide query to execute!");
     }
+    // console.error(`\nTHE QUERY IS: ${query}\n`)
     console.error(`\nTHE QUERY IS: ${query}\n`)
     if (!dontConnect) {
       await this.connect();
@@ -128,35 +129,19 @@ module.exports = class MySQLService {
   }
 
   async createUser({
-    user, pass, changePass, role, db, table, scope,
-  }) {
-    if (!user || !pass) {
-      throw new Error("Must provide user to create and it's password");
+    user, host = "%", pass, changePass, role,
+  }, dontConnect) {
+    const queryArray = [`CREATE USER '${user}'@'${host}'`];
+    queryArray.push(`IDENTIFIED BY '${pass}'`);
+    if (changePass) {
+      queryArray.push("PASSWORD EXPIRE");
     }
-    if (scope) {
-      await this.connect();
+    if (role) {
+      queryArray.push(`DEFAULT ROLE ${role}`);
     }
-    const result = {
-      createUser: await this.executeQuery({
-        query: `CREATE USER '${user}'@'localhost'
-                    IDENTIFIED BY '${pass}'${changePass ? " PASSWORD EXPIRE" : ""}${role
-  ? `DEFAULT ROLE ${role}` : ""}`,
-      }, scope),
-    };
-    if (!scope) {
-      return result;
-    }
-    try {
-      result.grantPermissions = await this.grantPermissions({
-        user, db, table, scope,
-      }, true);
-    } catch (error) {
-      await this.deleteUser({ user }, true);
-      throw new Error(`Failed to grant permissions for the new user: ${error.message || JSON.stringify(error)}`);
-    } finally {
-      await this.end();
-    }
-    return result;
+    return this.executeQuery({
+      query: queryArray.join(" ")
+    }, dontConnect);
   }
 
   async grantPermissions({
@@ -177,7 +162,7 @@ module.exports = class MySQLService {
       if (table && !db) {
         throw new Error("If specifying a table, specifying database is also required.");
       }
-        switch (scope) {
+      switch (scope) {
         case "full":
           grantArray.push("ALL PRIVILEGES");
           break;
