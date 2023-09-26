@@ -202,30 +202,8 @@ module.exports = class MySQLService {
     }, dontConnect);
   }
 
-  async createRole({
-    role, db, table, scope,
-  }) {
-    if (!role) {
-      throw new Error("Must provide role name!");
-    }
-    if (scope) {
-      await this.connect();
-    }
-    const result = { createRole: await this.executeQuery({ query: `CREATE ROLE '${role}';` }, scope) };
-    if (!scope) {
-      return result;
-    }
-    try {
-      result.grantPermissions = await this.grantPermissions({
-        user: role, db, table, scope,
-      }, true);
-    } catch (error) {
-      await this.deleteUser({ user: role }, true);
-      throw new Error(`Failed to grant permissions for the new role: ${error.message || JSON.stringify(error)}`);
-    } finally {
-      await this.end();
-    }
-    return result;
+  async createRole({ role }, dontConnect) {
+    return this.executeQuery({ query: `CREATE ROLE '${role}'` }, dontConnect);
   }
 
   async deleteUser({ user }, dontConnect) {

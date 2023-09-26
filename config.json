@@ -421,54 +421,9 @@
           "name": "role",
           "viewName": "Role Name",
           "type": "string",
-          "description": "The name of the new role.",
-          "placeholder": "rolename",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "db",
-          "viewName": "DB",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listDatabasesOrAll",
-          "description": "Grant the new role access to this database if not specified a table inside.",
-          "placeholder": "password",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "table",
-          "viewName": "Table",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listTablesOrAll",
-          "description": "Grant the new role access to this table.",
-          "placeholder": "tablename",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "scope",
-          "viewName": "Permission Scope",
-          "type": "options",
-          "options": [
-            {
-              "id": "read",
-              "name": "Read Only"
-            },
-            {
-              "id": "write",
-              "name": "Write/Update Only"
-            },
-            {
-              "id": "readWrite",
-              "name": "Read And Write"
-            },
-            {
-              "id": "full",
-              "name": "Full Access"
-            }
-          ],
-          "description": "Specify permission access rights to the new user.",
-          "placeholder": "Read Only | Write | Read and Write | Full Access",
+          "description": "The name of the new role",
+          "placeholder": "mynewrole",
+          "required": "true",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
