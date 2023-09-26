@@ -89,6 +89,23 @@ async function grantPermissions(action, settings) {
   });
 }
 
+async function grantRole(action, settings) {
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.grantRole({
+    user: parsers.autocomplete(action.params.user),
+    role: parsers.autocomplete(action.params.role),
+  });
+}
+
+async function showGrants(action, settings) {
+  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
+  const mySql = new MySQLService(conOpts);
+  return mySql.showGrants({
+    user: parsers.autocomplete(action.params.user),
+  });
+}
+
 async function createRole(action, settings) {
   const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
   const mySql = new MySQLService(conOpts);
@@ -163,6 +180,8 @@ module.exports = {
   getTablesSize,
   createUser,
   grantPermissions,
+  grantRole,
+  showGrants,
   createRole,
   deleteUser,
   deleteRole,

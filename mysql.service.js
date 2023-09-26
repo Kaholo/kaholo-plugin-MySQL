@@ -35,7 +35,6 @@ module.exports = class MySQLService {
       throw new Error("Must provide query to execute!");
     }
     // console.error(`\nTHE QUERY IS: ${query}\n`)
-    console.error(`\nTHE QUERY IS: ${query}\n`)
     if (!dontConnect) {
       await this.connect();
     }
@@ -94,9 +93,17 @@ module.exports = class MySQLService {
   }
 
   async getTablesLockedStatus({ db, table }) {
-    const filters = removeUndefinedAndEmpty({ Database: db, Table: table }, true);
-    const query = MySQLService.buildSqlCommand("SHOW OPEN TABLES", Object.entries(filters));
-    return this.executeQuery({ query });
+    if (table && !db) {
+      throw new Error("If specifying a table, specifying a database is also required.");
+    }
+    const queryArray = ["SHOW OPEN TABLES"];
+    if (db) {
+      queryArray.push(`WHERE \`Database\` = '${db}'`);
+    }
+    if (table) {
+      queryArray.push(`AND \`Table\` = '${table}'`);
+    }
+    return this.executeQuery({ query: queryArray.join(" ") });
   }
 
   async getServerVersion() {
@@ -140,7 +147,7 @@ module.exports = class MySQLService {
       queryArray.push(`DEFAULT ROLE ${role}`);
     }
     return this.executeQuery({
-      query: queryArray.join(" ")
+      query: queryArray.join(" "),
     }, dontConnect);
   }
 
@@ -171,11 +178,19 @@ module.exports = class MySQLService {
     grantArray.push(`ON ${db}.${table}`);
     grantArray.push(`TO ${user}`);
     if (scope === "fullWithGrant") {
-      grantArray.push(`WITH GRANT OPTION`);
+      grantArray.push("WITH GRANT OPTION");
     }
     return this.executeQuery({
       query: grantArray.join(" "),
     }, dontConnect);
+  }
+
+  async grantRole({ user, role }, dontConnect) {
+    return this.executeQuery({ query: `GRANT ${role} TO ${user}` }, dontConnect);
+  }
+
+  async showGrants({ user }, dontConnect) {
+    return this.executeQuery({ query: `SHOW GRANTS FOR ${user}` }, dontConnect);
   }
 
   async createRole({ role }, dontConnect) {
@@ -304,7 +319,7 @@ module.exports = class MySQLService {
     return this.executeQuery({
       query: `SELECT u.user 'user', u.host 'host', concat('\\'', u.user, '\\'@\\'', u.host, '\\'') 'userHost'
                     FROM mysql.user u
-                    WHERE account_locked = 'N';`
+                    WHERE account_locked = 'N';`,
     });
   }
 
@@ -312,8 +327,7 @@ module.exports = class MySQLService {
     return this.executeQuery({
       query: `SELECT u.user 'userOrRole', u.host 'host', concat('\\'', u.user, '\\'@\\'', u.host, '\\'') 'userOrRoleHost'
                     FROM mysql.user u
-                    WHERE u.account_locked != 'Y' OR NOT LENGTH(u.authentication_string)`
+                    WHERE u.account_locked != 'Y' OR NOT LENGTH(u.authentication_string)`,
     });
   }
-
 };
