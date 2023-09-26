@@ -232,7 +232,7 @@ module.exports = class MySQLService {
     if (!user) {
       throw new Error("Must provide user to delete");
     }
-    return this.executeQuery({ query: `DROP USER '${user}'@'localhost'` }, dontConnect);
+    return this.executeQuery({ query: `DROP USER ${user}` }, dontConnect);
   }
 
   async deleteRole({ role }, dontConnect) {
@@ -348,7 +348,9 @@ module.exports = class MySQLService {
 
   async listUsers() {
     return this.executeQuery({
-      query: "SELECT DISTINCT user from mysql.user;",
+      query: `SELECT u.user 'user', u.host 'host', concat('\\'', u.user, '\\'@\\'', u.host, '\\'') 'userHost'
+                    FROM mysql.user u
+                    WHERE account_locked = 'N';`
     });
   }
 };
