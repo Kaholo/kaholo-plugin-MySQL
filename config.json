@@ -112,29 +112,12 @@
     {
       "name": "testConnectivity",
       "viewName": "Test Connectivity",
-      "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        }
-      ]
+      "params": []
     },
     {
       "name": "getTablesLockedStatus",
       "viewName": "Get Tables Locked Status",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "db",
           "viewName": "Database",
@@ -160,29 +143,12 @@
     {
       "name": "getServerVersion",
       "viewName": "Get MySQL Server Version",
-      "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        }
-      ]
+      "params": []
     },
     {
       "name": "getDbSize",
       "viewName": "Get Databases Size",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "db",
           "viewName": "Database",
@@ -199,14 +165,6 @@
       "name": "getTablesSize",
       "viewName": "Get Tables Size",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "db",
           "viewName": "Database",
@@ -233,14 +191,6 @@
       "name": "createUser",
       "viewName": "Create User",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "user",
           "viewName": "Username",
@@ -293,14 +243,6 @@
       "viewName": "Grant Role to User",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
-        {
           "name": "user",
           "viewName": "User",
           "type": "autocomplete",
@@ -329,14 +271,6 @@
       "viewName": "Show Grants",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
-        {
           "name": "user",
           "viewName": "User or Role",
           "type": "autocomplete",
@@ -352,14 +286,6 @@
       "name": "grantPermissions",
       "viewName": "Grant Permissions",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "user",
           "viewName": "User or Role",
@@ -430,14 +356,6 @@
       "viewName": "Create Role",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
-        {
           "name": "role",
           "viewName": "Role Name",
           "type": "string",
@@ -452,14 +370,6 @@
       "name": "deleteUser",
       "viewName": "Delete User",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "user",
           "viewName": "User",
@@ -477,14 +387,6 @@
       "viewName": "Delete Role",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
-        {
           "name": "role",
           "viewName": "Role",
           "type": "autocomplete",
@@ -500,14 +402,6 @@
       "name": "copyStructure",
       "viewName": "Copy Table Structure",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Source Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to MySQL Server containing the source DB and table.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "db",
           "viewName": "Source DB",
@@ -565,57 +459,22 @@
     {
       "name": "listDbs",
       "viewName": "List Databases",
-      "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        }
-      ]
+      "params": []
     },
     {
       "name": "listRoles",
       "viewName": "List Roles",
-      "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        }
-      ]
+      "params": []
     },
     {
       "name": "listUsers",
       "viewName": "List Users",
-      "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        }
-      ]
+      "params": []
     },
     {
       "name": "listTables",
       "viewName": "List Tables",
       "params": [
-        {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
-        },
         {
           "name": "db",
           "viewName": "Database",

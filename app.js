@@ -30,41 +30,41 @@ async function insertData(params) {
   });
 }
 
-async function testConnectivity(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function testConnectivity(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.testConnectivity();
 }
 
-async function getTablesLockedStatus(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function getTablesLockedStatus(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.getTablesLockedStatus({
-    db: parsers.autocomplete(action.params.db),
-    table: parsers.autocomplete(action.params.table),
+    db: params.db,
+    table: params.table,
   });
 }
 
-async function getServerVersion(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function getServerVersion(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.getServerVersion();
 }
 
-async function getDbSize(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function getDbSize(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.getDbSize({
-    db: parsers.autocomplete(action.params.db),
+    db: params.db,
   });
 }
 
-async function getTablesSize(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function getTablesSize(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.getTablesSize({
-    db: parsers.autocomplete(action.params.db),
-    table: parsers.autocomplete(action.params.table),
+    db: params.db,
+    table: params.table,
   });
 }
 

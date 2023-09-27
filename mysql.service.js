@@ -51,10 +51,6 @@ module.exports = class MySQLService {
   }
 
   async insertData({ db, table, data }, dontConnect = false) {
-    console.error(`\nDB: ${db}\nTABLE: ${table}\nDATA: ${JSON.stringify(data)}\n`)
-    // if (!table || !data || !data.length) {
-    //   throw new Error("Didn't provide one of the required parameters.");
-    // }
     if (!dontConnect) {
       await this.connect();
     }
