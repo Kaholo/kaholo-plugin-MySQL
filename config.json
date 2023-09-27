@@ -19,35 +19,36 @@
     "restore",
     "query"
   ],
-  "settings": [
-    {
-      "name": "conStr",
-      "viewName": "Connection String",
-      "type": "vault",
-      "description": "The default connection string to connect to MYSQL database.",
-      "placeholder": "Server=myServerAddress;Port=3306;Database=myDataBase;Uid=myUsername;Pwd=myPassword;",
-      "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
-    }
-  ],
+  "auth": {
+    "authId": "connectionStringMysqlAccount",
+    "params": [
+      {
+        "name": "connectionString",
+        "viewName": "Connection String",
+        "description": "Connection string used to connect to the database",
+        "type": "string",
+        "learnUrl": "https://dev.mysql.com/doc/refman/8.0/en/connecting-using-uri-or-key-value-pairs.html",
+        "required": true
+      },
+      {
+        "name": "password",
+        "viewName": "Password",
+        "description": "Select password from the Kaholo vault if you don't want to enter it directly into the connection string. If both are provided, a password from Kaholo vault takes precedence",
+        "type": "vault"
+      }
+    ]
+  },
   "methods": [
     {
       "name": "executeQuery",
       "viewName": "Execute Query",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
-        },
-        {
           "name": "query",
           "viewName": "Query String",
           "type": "text",
-          "description": "MySQL query is any command that is used to retrieve the data from a table. MySQL can be used for querying the data, filtering data, sorting data, joining the tables, grouping data, modifying the data.",
-          "placeholder": "SELECT * FROM `table`';",
+          "description": "The SQL query to execute",
+          "placeholder": "SELECT * FROM zoology.orders",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
@@ -57,19 +58,17 @@
       "viewName": "Execute SQL File",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "description": "The connection string to connect to the configured MYSQL database.",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
-        },
-        {
           "name": "path",
           "viewName": "SQL File Path",
           "type": "string",
-          "description": "Path of the sql file to execute.",
-          "placeholder": "/home/user/execute.sql",
+          "required": true,
+          "parserType": "filePath",
+          "parserOptions": {
+            "throwIfDoesntExist": true,
+            "acceptedTypes": ["file"]
+          },
+          "description": "Path on Kaholo agent to the SQL file to execute",
+          "placeholder": "reports/weekly.sql",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
@@ -79,15 +78,10 @@
       "viewName": "Insert Data To Table",
       "params": [
         {
-          "name": "conStr",
-          "viewName": "Connection String",
-          "type": "vault",
-          "placeholder": "Select or create vault item"
-        },
-        {
           "name": "db",
           "viewName": "Database",
           "type": "autocomplete",
+          "required": true,
           "autocompleteType": "function",
           "functionName": "listDatabasesAuto",
           "description": "Database containing the table.",
@@ -98,6 +92,7 @@
           "name": "table",
           "viewName": "Table",
           "type": "autocomplete",
+          "required": true,
           "autocompleteType": "function",
           "functionName": "listTablesAuto",
           "description": "The table to insert data into.",
@@ -107,8 +102,10 @@
         {
           "name": "data",
           "viewName": "Data",
-          "type": "string",
-          "description": "Provide from code an array of objects to insert into the table. All objects fields should have matching names to the table fields."
+          "type": "text",
+          "required": true,
+          "parserType": "object",
+          "description": "Data in the form of an array of objects from the code layer or a JSON text respresentation"
         }
       ]
     },
@@ -122,7 +119,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         }
       ]
     },
@@ -136,7 +133,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "db",
@@ -170,7 +167,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         }
       ]
     },
@@ -184,7 +181,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "db",
@@ -208,7 +205,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "db",
@@ -242,7 +239,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "user",
@@ -301,7 +298,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "user",
@@ -337,7 +334,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "user",
@@ -361,7 +358,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "user",
@@ -438,7 +435,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "role",
@@ -461,7 +458,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "user",
@@ -485,7 +482,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "role",
@@ -509,7 +506,7 @@
           "type": "vault",
           "description": "The connection string to connect to MySQL Server containing the source DB and table.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "db",
@@ -575,7 +572,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         }
       ]
     },
@@ -589,7 +586,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         }
       ]
     },
@@ -603,7 +600,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         }
       ]
     },
@@ -617,7 +614,7 @@
           "type": "vault",
           "description": "The connection string to connect to the configured MYSQL database.",
           "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20."
+          "learnUrl": "https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html"
         },
         {
           "name": "db",

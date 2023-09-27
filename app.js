@@ -1,30 +1,32 @@
+const { bootstrap } = require("@kaholo/plugin-library");
+const { createConnectionDetails } = require("./helpers");
 const MySQLService = require("./mysql.service");
 const parsers = require("./parsers");
 const autocomplete = require("./autocomplete");
 
-async function executeQuery(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function executeQuery(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.executeQuery({
-    query: parsers.string(action.params.query),
+    query: params.query,
   });
 }
 
-async function executeSQLFile(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function executeSQLFile(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.executeSQLFile({
-    path: parsers.path(action.params.path),
+    path: params.path.absolutePath,
   });
 }
 
-async function insertData(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function insertData(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.insertData({
-    db: parsers.autocomplete(action.params.db),
-    table: parsers.autocomplete(action.params.table),
-    data: parsers.arrayOfObjects(action.params.data),
+    db: params.db,
+    table: params.table,
+    data: params.data,
   });
 }
 
@@ -169,7 +171,7 @@ async function listTables(action, settings) {
   });
 }
 
-module.exports = {
+module.exports = bootstrap({
   executeQuery,
   executeSQLFile,
   insertData,
@@ -190,7 +192,6 @@ module.exports = {
   listDbs,
   listTables,
   listRoles,
-  listUsers,
+  listUsers},
   // autocomplete methods
-  ...autocomplete,
-};
+  autocomplete);
