@@ -12,6 +12,7 @@ module.exports = class MySQLService {
       throw new Error("Connection string not provided!");
     }
     if (!conOpts.host || !conOpts.user || !conOpts.password) {
+      console.error(`CONOPTS: ${JSON.stringify(conOpts)}`)
       throw new Error("Didn't provide all required authentication information in connection string");
     }
     this.conOpts = conOpts;
@@ -34,7 +35,7 @@ module.exports = class MySQLService {
     if (!query) {
       throw new Error("Must provide query to execute!");
     }
-    // console.error(`\nTHE QUERY IS: ${query}\n`)
+    console.error(`\nTHE QUERY IS: ${query}\n`)
     if (!dontConnect) {
       await this.connect();
     }
@@ -209,13 +210,14 @@ module.exports = class MySQLService {
   }
 
   async copyStructure({
-    srcDb, srcTable, destConStr, destDb, destTable, override,
+    srcDb, srcTable, destConOpts, destDb, destTable, override,
   }) {
-    if (!(srcTable && destConStr && destDb && destTable)) {
+    console.error(`DESTCONOPTS: ${JSON.stringify(destConOpts)}`)
+    if (!(srcTable && destConOpts && destDb && destTable)) {
       throw new Error("Didn't provide one of the required parameters.");
     }
     const srcConOpts = { ...this.conOpts };
-    const destConOpts = { ...(destConStr || this.conOpts) };
+    console.error(`SOURCECONOPTS: ${JSON.stringify(srcConOpts)}`)
     if (srcDb) {
       srcConOpts.database = srcDb;
     }

@@ -1,5 +1,5 @@
 const { bootstrap } = require("@kaholo/plugin-library");
-const { createConnectionDetails } = require("./helpers");
+const { createConnectionDetails, createConDetFromString } = require("./helpers");
 const MySQLService = require("./mysql.service");
 const parsers = require("./parsers");
 const autocomplete = require("./autocomplete");
@@ -68,106 +68,110 @@ async function getTablesSize(params) {
   });
 }
 
-async function createUser(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function createUser(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.createUser({
-    user: parsers.string(action.params.user),
-    host: parsers.string(action.params.host),
-    pass: action.params.pass,
-    changePass: parsers.boolean(action.params.changePass),
-    role: action.params.role,
+    user: params.user,
+    host: params.host,
+    pass: params.pass,
+    changePass: params.changePass,
+    role: params.role,
   });
 }
 
-async function grantPermissions(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function grantPermissions(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.grantPermissions({
-    user: parsers.autocomplete(action.params.user),
-    db: parsers.autocomplete(action.params.db),
-    table: parsers.autocomplete(action.params.table),
-    scope: action.params.scope,
+    user: params.user,
+    db: params.db,
+    table: params.table,
+    scope: params.scope,
   });
 }
 
-async function grantRole(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function grantRole(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.grantRole({
-    user: parsers.autocomplete(action.params.user),
-    role: parsers.autocomplete(action.params.role),
+    user: params.user,
+    role: params.role,
   });
 }
 
-async function showGrants(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function showGrants(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.showGrants({
-    user: parsers.autocomplete(action.params.user),
+    user: params.user,
   });
 }
 
-async function createRole(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function createRole(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.createRole({
-    role: parsers.string(action.params.role),
+    role: params.role,
   });
 }
 
-async function deleteUser(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function deleteUser(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.deleteUser({
-    user: parsers.autocomplete(action.params.user),
+    user: params.user,
   });
 }
 
-async function deleteRole(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function deleteRole(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.deleteRole({
-    role: parsers.autocomplete(action.params.role),
+    role: params.role,
   });
 }
 
-async function copyStructure(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
-  return mySql.copyStructure({
-    srcDb: parsers.autocomplete(action.params.db),
-    srcTable: parsers.autocomplete(action.params.srcTable),
-    destConStr: parsers.mySqlConStr(action.params.destConStr),
-    destDb: parsers.autocomplete(action.params.destDb),
-    destTable: parsers.autocomplete(action.params.destTable),
-    override: parsers.boolean(action.params.override),
-  });
-}
-
-async function listDbs(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function listDbs(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.listDbs({});
 }
 
-async function listRoles(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function listRoles(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.listRoles();
 }
 
-async function listUsers(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function listUsers(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.listUsers();
 }
 
-async function listTables(action, settings) {
-  const conOpts = parsers.mySqlConStr(action.params.conStr || settings.conStr);
-  const mySql = new MySQLService(conOpts);
+async function listTables(params) {
+  const connectionDetails = createConnectionDetails(params)
+  const mySql = new MySQLService(connectionDetails);
   return mySql.listTables({
-    db: parsers.autocomplete(action.params.db),
+    db: params.db,
+  });
+}
+
+async function copyStructure(params) {
+  const connectionDetails = createConnectionDetails(params)
+  let destConDet = "";
+  if (params.destConStr) {
+    destConDet = createConDetFromString(params.destConStr);
+  }
+  const mySql = new MySQLService(connectionDetails);
+  return mySql.copyStructure({
+    srcDb: params.db,
+    srcTable: params.srcTable,
+    destConOpts: destConDet || connectionDetails,
+    destDb: params.destDb,
+    destTable: params.destTable,
+    override: params.override,
   });
 }
 

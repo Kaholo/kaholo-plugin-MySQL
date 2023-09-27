@@ -2,11 +2,24 @@ const { ConnectionString } = require("connection-string");
 
 function createConnectionDetails({ connectionString, password }) {
     const connectionDetails = new ConnectionString(connectionString);
-
-    if (password) {
-        connectionDetails.password = password;
+    const connectionDetailsAugmented = {
+        host: connectionDetails.hosts[0].name,
+        ...connectionDetails
     }
-    return connectionDetails;
+    if (password) {
+        connectionDetailsAugmented.password = password;
+    }
+    return connectionDetailsAugmented;
+}
+
+// needed for copyStructure when destination is not as kaholo account
+function createConDetFromString(connectionString) {
+    const connectionDetails = new ConnectionString(connectionString);
+    const connectionDetailsAugmented = {
+        host: connectionDetails.hosts[0].name,
+        ...connectionDetails
+    }
+    return connectionDetailsAugmented;
 }
 
 function removeUndefinedAndEmpty(obj, removeSpecial) {
@@ -25,5 +38,6 @@ function removeUndefinedAndEmpty(obj, removeSpecial) {
 
 module.exports = {
     createConnectionDetails,
+    createConDetFromString,
     removeUndefinedAndEmpty,
 };

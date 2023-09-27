@@ -213,7 +213,7 @@
           "name": "pass",
           "viewName": "Password",
           "type": "vault",
-          "description": "Password for the new user.",
+          "description": "Password for the new user",
           "placeholder": "Select or create vault item",
           "required": true,
           "learnUrl": "https://dev.mysql.com/doc/"
@@ -223,7 +223,7 @@
           "viewName": "Change Password On Login",
           "type": "boolean",
           "default": "false",
-          "description": "Change password on initial login.",
+          "description": "Force user to change password on initial login",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
         {
@@ -301,9 +301,10 @@
           "name": "db",
           "viewName": "DB",
           "type": "autocomplete",
+          "required": true,
           "autocompleteType": "function",
           "functionName": "listDatabasesOrAll",
-          "description": "Grant the user access to this database if not specified a table inside.",
+          "description": "Database to which access will be granted",
           "placeholder": "mydb",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
@@ -313,7 +314,7 @@
           "type": "autocomplete",
           "autocompleteType": "function",
           "functionName": "listTablesOrAll",
-          "description": "Grant the user access to this table.",
+          "description": "Table to which access will be granted. If none specified, access will be granted to entire database.",
           "placeholder": "tablename",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
@@ -345,8 +346,7 @@
               "name": "Full Access with Grant Option"
             }
           ],
-          "description": "Specify permission access rights to the new user.",
-          "placeholder": "Read Only | Write | Read and Write | Full Access",
+          "description": "Select the access rights to grant",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
@@ -426,7 +426,7 @@
           "name": "destConStr",
           "viewName": "Destination Connection String",
           "type": "vault",
-          "description": "The connectiong string of the MySQL server to copy the table structure into.",
+          "description": "The vaulted connection string of the MySQL server into which to copy the table structure, if copying to another server. This string must include password. Format - mysql://myuser:mypasswd@10.11.22.33:3306/mydb?SslMode=Preferred",
           "placeholder": "Select or create vault item",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
