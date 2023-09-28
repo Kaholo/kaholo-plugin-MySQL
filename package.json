@@ -1,0 +1,23 @@
+{
+  "name": "kaholo-plugin-mysql",
+  "version": "2.0.2",
+  "description": "MySQL plugin for Kaholo",
+  "main": "app.js",
+  "scripts": {
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint . --fix"
+  },
+  "author": "Kaholo Team",
+  "license": "ISC",
+  "dependencies": {
+    "@kaholo/plugin-library": "^2.4.0",
+    "connection-string": "^4.4.0",
+    "mysql": "2.18.1",
+    "mysqldump": "3.2.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.28.1"
+  }
+}
