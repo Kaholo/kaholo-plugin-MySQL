@@ -1,7 +1,6 @@
 const { bootstrap } = require("@kaholo/plugin-library");
 const { createConnectionDetails, createConDetFromString } = require("./helpers");
 const MySQLService = require("./mysql.service");
-const parsers = require("./parsers");
 const autocomplete = require("./autocomplete");
 
 async function executeQuery(params) {

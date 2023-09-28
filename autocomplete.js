@@ -1,17 +1,9 @@
-const parsers = require("./parsers");
 const MySQLService = require("./mysql.service");
+const { createConnectionDetails } = require("./helpers");
 
 // auto complete helper methods
 
 const MAX_RESULTS = 10;
-
-function mapAutoParams(autoParams) {
-  const params = {};
-  autoParams.forEach((param) => {
-    params[param.name] = parsers.autocomplete(param.value);
-  });
-  return params;
-}
 
 /** *
  * @returns {[{id, value}]} filtered result items
@@ -47,12 +39,10 @@ function filterItems(items, query) {
 }
 
 function listAuto(listFuncName, fields, addAllOption) {
-  return async (query, pluginSettings, triggerParameters) => {
-    const settings = mapAutoParams(pluginSettings); const
-      params = mapAutoParams(triggerParameters);
-    const conOpts = parsers.mySqlConStr(params.conStr || settings.conStr);
-    const client = new MySQLService(conOpts);
-    const result = await client[listFuncName](params);
+  return async (query, params) => {
+    const connectionDetails = createConnectionDetails(params)
+    const mySql = new MySQLService(connectionDetails);
+    const result = await mySql[listFuncName](params);
     const items = handleResult(result, query, ...fields);
     return addAllOption ? [{ id: "*", value: "All" }, ...items] : items;
   };
