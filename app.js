@@ -4,7 +4,7 @@ const MySQLService = require("./mysql.service");
 const autocomplete = require("./autocomplete");
 
 async function executeQuery(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.executeQuery({
     query: params.query,
@@ -12,7 +12,7 @@ async function executeQuery(params) {
 }
 
 async function executeSQLFile(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.executeSQLFile({
     path: params.path.absolutePath,
@@ -20,7 +20,7 @@ async function executeSQLFile(params) {
 }
 
 async function insertData(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.insertData({
     db: params.db,
@@ -30,13 +30,13 @@ async function insertData(params) {
 }
 
 async function testConnectivity(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.testConnectivity();
 }
 
 async function getTablesLockedStatus(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.getTablesLockedStatus({
     db: params.db,
@@ -45,13 +45,13 @@ async function getTablesLockedStatus(params) {
 }
 
 async function getServerVersion(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.getServerVersion();
 }
 
 async function getDbSize(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.getDbSize({
     db: params.db,
@@ -59,7 +59,7 @@ async function getDbSize(params) {
 }
 
 async function getTablesSize(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.getTablesSize({
     db: params.db,
@@ -68,7 +68,7 @@ async function getTablesSize(params) {
 }
 
 async function createUser(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.createUser({
     user: params.user,
@@ -80,7 +80,7 @@ async function createUser(params) {
 }
 
 async function grantPermissions(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.grantPermissions({
     user: params.user,
@@ -91,7 +91,7 @@ async function grantPermissions(params) {
 }
 
 async function grantRole(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.grantRole({
     user: params.user,
@@ -100,7 +100,7 @@ async function grantRole(params) {
 }
 
 async function showGrants(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.showGrants({
     user: params.user,
@@ -108,7 +108,7 @@ async function showGrants(params) {
 }
 
 async function createRole(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.createRole({
     role: params.role,
@@ -116,7 +116,7 @@ async function createRole(params) {
 }
 
 async function deleteUser(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.deleteUser({
     user: params.user,
@@ -124,7 +124,7 @@ async function deleteUser(params) {
 }
 
 async function deleteRole(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.deleteRole({
     role: params.role,
@@ -132,25 +132,25 @@ async function deleteRole(params) {
 }
 
 async function listDbs(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.listDbs({});
 }
 
 async function listRoles(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.listRoles();
 }
 
 async function listUsers(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.listUsers();
 }
 
 async function listTables(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   const mySql = new MySQLService(connectionDetails);
   return mySql.listTables({
     db: params.db,
@@ -158,10 +158,10 @@ async function listTables(params) {
 }
 
 async function copyStructure(params) {
-  const connectionDetails = createConnectionDetails(params)
+  const connectionDetails = createConnectionDetails(params);
   let destConDet = "";
   if (params.destConStr) {
-    destConDet = createConDetFromString(params.destConStr);
+    destConDet = createConDetFromString(params.destConStr, params.showQuery);
   }
   const mySql = new MySQLService(connectionDetails);
   return mySql.copyStructure({
@@ -174,27 +174,30 @@ async function copyStructure(params) {
   });
 }
 
-module.exports = bootstrap({
-  executeQuery,
-  executeSQLFile,
-  insertData,
-  testConnectivity,
-  getTablesLockedStatus,
-  getServerVersion,
-  getDbSize,
-  getTablesSize,
-  createUser,
-  grantPermissions,
-  grantRole,
-  showGrants,
-  createRole,
-  deleteUser,
-  deleteRole,
-  copyStructure,
-  // list funcs
-  listDbs,
-  listTables,
-  listRoles,
-  listUsers},
+module.exports = bootstrap(
+  {
+    executeQuery,
+    executeSQLFile,
+    insertData,
+    testConnectivity,
+    getTablesLockedStatus,
+    getServerVersion,
+    getDbSize,
+    getTablesSize,
+    createUser,
+    grantPermissions,
+    grantRole,
+    showGrants,
+    createRole,
+    deleteUser,
+    deleteRole,
+    copyStructure,
+    // list funcs
+    listDbs,
+    listTables,
+    listRoles,
+    listUsers,
+  },
   // autocomplete methods
-  autocomplete);
+  autocomplete,
+);

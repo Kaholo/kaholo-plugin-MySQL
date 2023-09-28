@@ -40,7 +40,7 @@ function filterItems(items, query) {
 
 function listAuto(listFuncName, fields, addAllOption) {
   return async (query, params) => {
-    const connectionDetails = createConnectionDetails(params)
+    const connectionDetails = createConnectionDetails(params);
     const mySql = new MySQLService(connectionDetails);
     const result = await mySql[listFuncName](params);
     const items = handleResult(result, query, ...fields);

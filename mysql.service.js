@@ -2,21 +2,25 @@ const mysql = require("mysql");
 const fs = require("fs");
 const mysqldump = require("mysqldump").default;
 const { promisify } = require("util");
-const { removeUndefinedAndEmpty } = require("./helpers");
 
 const asyncFuncs = ["connect", "end", "query", "beginTransaction", "commit", "rollback"];
 
 module.exports = class MySQLService {
-  constructor(conOpts) {
-    if (!conOpts) {
-      throw new Error("Connection string not provided!");
+  constructor(connectionDetails) {
+    if (!connectionDetails) {
+      throw new Error("Connection string not provided! Expected format: mysql://username@host:port/database");
     }
-    if (!conOpts.host || !conOpts.user || !conOpts.password) {
-      console.error(`CONOPTS: ${JSON.stringify(conOpts)}`)
-      throw new Error("Didn't provide all required authentication information in connection string");
+    if (!connectionDetails.host) {
+      throw new Error("Host not found in connection string! Expected format: mysql://username@host:port/database");
     }
-    this.conOpts = conOpts;
-    this.connection = mysql.createConnection(removeUndefinedAndEmpty(conOpts));
+    if (!connectionDetails.user) {
+      throw new Error("User (name) not found in connection string! Expected format: mysql://username@host:port/database");
+    }
+    if (!connectionDetails.host) {
+      throw new Error("Password not found in connection string or Kaholo plugin account! Expected format: mysql://username@host:port/database");
+    }
+    this.connectionDetails = connectionDetails;
+    this.connection = mysql.createConnection(connectionDetails);
     // for (const func of asyncFuncs) {
     //   this[func] = promisify(this.connection[func]).bind(this.connection);
     // }
@@ -35,7 +39,9 @@ module.exports = class MySQLService {
     if (!query) {
       throw new Error("Must provide query to execute!");
     }
-    console.error(`\nTHE QUERY IS: ${query}\n`)
+    if (!this.connectionDetails.showQuery) {
+      console.error(`\nTHE QUERY IS: ${query}\n`);
+    }
     if (!dontConnect) {
       await this.connect();
     }
@@ -85,9 +91,17 @@ module.exports = class MySQLService {
   }
 
   async testConnectivity() {
-    await this.connect();
-    await this.end();
-    return "Connected!";
+    try {
+      await this.connect();
+      await this.end();
+    } catch (e) {
+      const result = {
+        status: "error",
+        ...e,
+      };
+      throw result;
+    }
+    return { status: "connected" };
   }
 
   async getTablesLockedStatus({ db, table }) {
@@ -120,7 +134,7 @@ module.exports = class MySQLService {
   }
 
   async getTablesSize({ db, table }) {
-    const filters = removeUndefinedAndEmpty({ table_schema: db, table_name: table }, true);
+    const filters = { table_schema: db, table_name: table };
     const sorters = { table_schema: "DESC", table_name: "DESC" };
     return this.executeQuery({
       query: MySQLService.buildSqlCommand(
@@ -138,11 +152,11 @@ module.exports = class MySQLService {
   }, dontConnect) {
     const queryArray = [`CREATE USER '${user}'@'${host}'`];
     queryArray.push(`IDENTIFIED BY '${pass}'`);
-    if (changePass) {
-      queryArray.push("PASSWORD EXPIRE");
-    }
     if (role) {
       queryArray.push(`DEFAULT ROLE ${role}`);
+    }
+    if (changePass) {
+      queryArray.push("PASSWORD EXPIRE");
     }
     return this.executeQuery({
       query: queryArray.join(" "),
@@ -212,19 +226,18 @@ module.exports = class MySQLService {
   async copyStructure({
     srcDb, srcTable, destConOpts, destDb, destTable, override,
   }) {
-    console.error(`DESTCONOPTS: ${JSON.stringify(destConOpts)}`)
     if (!(srcTable && destConOpts && destDb && destTable)) {
       throw new Error("Didn't provide one of the required parameters.");
     }
-    const srcConOpts = { ...this.conOpts };
-    console.error(`SOURCECONOPTS: ${JSON.stringify(srcConOpts)}`)
+    const srcConOpts = { ...this.connectionDetails };
+    const revisedDestConOpts = destConOpts;
     if (srcDb) {
       srcConOpts.database = srcDb;
     }
     if (destDb) {
-      destConOpts.database = destDb;
+      revisedDestConOpts.database = destDb;
     }
-    const destService = new MySQLService(destConOpts);
+    const destService = new MySQLService(revisedDestConOpts);
     await destService.connect();
     const existingTable = await destService.executeQuery({ query: `SHOW TABLES LIKE '${destTable}';` }, true);
     let dataDump; const result = {}; let lastAction; let tempCreated = false; let

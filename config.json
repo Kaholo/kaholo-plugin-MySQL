@@ -38,6 +38,13 @@
       }
     ]
   },
+  "settings":[{
+    "name": "showQuery",
+    "viewName": "Show queries in Activity Log",
+    "description": "If enabled, fully formed queries are displayed in the Kaholo Activity Log before execution. Recommended only for diagnosing issues.",
+    "type": "boolean",
+    "default": false
+  }],
   "methods": [
     {
       "name": "executeQuery",
