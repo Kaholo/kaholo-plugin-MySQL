@@ -4,7 +4,8 @@
   "description": "MySQL plugin for Kaholo",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint . --fix"
   },
   "author": "Kaholo Team",
   "license": "ISC",
