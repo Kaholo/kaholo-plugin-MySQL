@@ -87,7 +87,7 @@
     },
     {
       "name": "insertData",
-      "viewName": "Insert Data To Table",
+      "viewName": "Insert Data Into Table",
       "params": [
         {
           "name": "db",
