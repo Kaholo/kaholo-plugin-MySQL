@@ -47,6 +47,11 @@
   }],
   "methods": [
     {
+      "name": "testConnectivity",
+      "viewName": "Test Connectivity",
+      "params": []
+    },
+    {
       "name": "executeQuery",
       "viewName": "Execute Query",
       "params": [
@@ -117,40 +122,25 @@
       ]
     },
     {
-      "name": "testConnectivity",
-      "viewName": "Test Connectivity",
+      "name": "listDbs",
+      "viewName": "List Databases",
       "params": []
     },
     {
-      "name": "getTablesLockedStatus",
-      "viewName": "Get Tables Locked Status",
+      "name": "listTables",
+      "viewName": "List Tables",
       "params": [
         {
           "name": "db",
           "viewName": "Database",
           "type": "autocomplete",
           "autocompleteType": "function",
-          "functionName": "listDatabasesAuto",
+          "functionName": "listDatabasesOrAll",
           "description": "Database name to retrieve data from.",
           "placeholder": "dbname",
           "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "table",
-          "viewName": "Table",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listTablesAuto",
-          "description": "Table name to retrieve the lock status from.",
-          "placeholder": "tablename",
-          "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
-    },
-    {
-      "name": "getServerVersion",
-      "viewName": "Get MySQL Server Version",
-      "params": []
     },
     {
       "name": "getDbSize",
@@ -193,6 +183,100 @@
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
+    },
+    {
+      "name": "getTablesLockedStatus",
+      "viewName": "Get Tables Locked Status",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "Database name to retrieve data from.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listTablesAuto",
+          "description": "Table name to retrieve the lock status from.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "copyStructure",
+      "viewName": "Copy Table Structure",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Source DB",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "The DB containing the source table.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "srcTable",
+          "viewName": "Source Table",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listTablesAuto",
+          "description": "Copy this table's structure",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "destConStr",
+          "viewName": "Destination Connection String",
+          "type": "vault",
+          "description": "The vaulted connection string of the MySQL server into which to copy the table structure, if copying to another server. This string must include password. Format - mysql://myuser:mypasswd@10.11.22.33:3306/mydb?SslMode=Preferred",
+          "placeholder": "Select or create vault item",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "destDb",
+          "viewName": "Destination DB",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "The DB to contain the destination table.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "destTable",
+          "viewName": "Destination Table Name",
+          "type": "string",
+          "description": "Copy the source table structure into a table with this name.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "override",
+          "viewName": "Override Destination Table",
+          "type": "boolean",
+          "description": "If true, allow the destination table to be an existing table and try coping the data from it to the new structure. If false throw an error in case the destination table already exists."
+        }
+      ]
+    },
+    {
+      "name": "listUsers",
+      "viewName": "List Users",
+      "params": []
+    },
+    {
+      "name": "listRoles",
+      "viewName": "List Roles",
+      "params": []
     },
     {
       "name": "createUser",
@@ -246,6 +330,21 @@
       ]
     },
     {
+      "name": "createRole",
+      "viewName": "Create Role",
+      "params": [
+        {
+          "name": "role",
+          "viewName": "Role Name",
+          "type": "string",
+          "description": "The name of the new role",
+          "placeholder": "mynewrole",
+          "required": "true",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
       "name": "grantRole",
       "viewName": "Grant Role to User",
       "params": [
@@ -272,22 +371,6 @@
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
-    },
-    {
-      "name": "showGrants",
-      "viewName": "Show Grants",
-      "params": [
-        {
-          "name": "user",
-          "viewName": "User or Role",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listUsersRolesAuto",
-          "description": "The user or role for whom to show grants",
-          "placeholder": "'dbreaders'@'%'",
-          "required": true,
-          "learnUrl": "https://dev.mysql.com/doc/"
-        }]
     },
     {
       "name": "grantPermissions",
@@ -359,19 +442,25 @@
       ]
     },
     {
-      "name": "createRole",
-      "viewName": "Create Role",
+      "name": "showGrants",
+      "viewName": "Show Grants",
       "params": [
         {
-          "name": "role",
-          "viewName": "Role Name",
-          "type": "string",
-          "description": "The name of the new role",
-          "placeholder": "mynewrole",
-          "required": "true",
+          "name": "user",
+          "viewName": "User or Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listUsersRolesAuto",
+          "description": "The user or role for whom to show grants",
+          "placeholder": "'dbreaders'@'%'",
+          "required": true,
           "learnUrl": "https://dev.mysql.com/doc/"
-        }
-      ]
+        }]
+    },
+    {
+      "name": "getServerVersion",
+      "viewName": "Get MySQL Server Version",
+      "params": []
     },
     {
       "name": "deleteUser",
@@ -401,95 +490,6 @@
           "functionName": "listRolesAuto",
           "description": "The role to delete",
           "placeholder": "Please select a role",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        }
-      ]
-    },
-    {
-      "name": "copyStructure",
-      "viewName": "Copy Table Structure",
-      "params": [
-        {
-          "name": "db",
-          "viewName": "Source DB",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listDatabasesAuto",
-          "description": "The DB containing the source table.",
-          "placeholder": "dbname",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "srcTable",
-          "viewName": "Source Table",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listTablesAuto",
-          "description": "Copy this table's structure",
-          "placeholder": "tablename",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "destConStr",
-          "viewName": "Destination Connection String",
-          "type": "vault",
-          "description": "The vaulted connection string of the MySQL server into which to copy the table structure, if copying to another server. This string must include password. Format - mysql://myuser:mypasswd@10.11.22.33:3306/mydb?SslMode=Preferred",
-          "placeholder": "Select or create vault item",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "destDb",
-          "viewName": "Destination DB",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listDatabasesAuto",
-          "description": "The DB to contain the destination table.",
-          "placeholder": "dbname",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "destTable",
-          "viewName": "Destination Table Name",
-          "type": "string",
-          "description": "Copy the source table structure into a table with this name.",
-          "placeholder": "tablename",
-          "learnUrl": "https://dev.mysql.com/doc/"
-        },
-        {
-          "name": "override",
-          "viewName": "Override Destination Table",
-          "type": "boolean",
-          "description": "If true, allow the destination table to be an existing table and try coping the data from it to the new structure. If false throw an error in case the destination table already exists."
-        }
-      ]
-    },
-    {
-      "name": "listDbs",
-      "viewName": "List Databases",
-      "params": []
-    },
-    {
-      "name": "listRoles",
-      "viewName": "List Roles",
-      "params": []
-    },
-    {
-      "name": "listUsers",
-      "viewName": "List Users",
-      "params": []
-    },
-    {
-      "name": "listTables",
-      "viewName": "List Tables",
-      "params": [
-        {
-          "name": "db",
-          "viewName": "Database",
-          "type": "autocomplete",
-          "autocompleteType": "function",
-          "functionName": "listDatabasesOrAll",
-          "description": "Database name to retrieve data from.",
-          "placeholder": "dbname",
           "learnUrl": "https://dev.mysql.com/doc/"
         }
       ]
