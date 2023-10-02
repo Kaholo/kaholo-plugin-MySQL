@@ -1,6 +1,5 @@
 {
   "name": "kaholo-plugin-mysql",
-  "version": "2.0.2",
   "description": "MySQL plugin for Kaholo",
   "main": "app.js",
   "scripts": {
