@@ -21,9 +21,6 @@ module.exports = class MySQLService {
     }
     this.connectionDetails = connectionDetails;
     this.connection = mysql.createConnection(connectionDetails);
-    // for (const func of asyncFuncs) {
-    //   this[func] = promisify(this.connection[func]).bind(this.connection);
-    // }
     asyncFuncs.forEach((func) => {
       this[func] = promisify(this.connection[func]).bind(this.connection);
     });
@@ -39,7 +36,7 @@ module.exports = class MySQLService {
     if (!query) {
       throw new Error("Must provide query to execute!");
     }
-    if (!this.connectionDetails.showQuery) {
+    if (this.connectionDetails.showQuery) {
       console.error(`\nTHE QUERY IS: ${query}\n`);
     }
     if (!dontConnect) {

@@ -1,6 +1,6 @@
 const { ConnectionString } = require("connection-string");
 
-function createConnectionDetails({ connectionString, password, showQuery }) {
+function createConnectionDetails({ connectionString, password}, { showQuery }) {
   const connectionDetails = new ConnectionString(connectionString);
   const connectionDetailsAugmented = {
     host: connectionDetails.hosts[0].name,
@@ -9,20 +9,22 @@ function createConnectionDetails({ connectionString, password, showQuery }) {
   if (password) {
     connectionDetailsAugmented.password = password;
   }
-  if (showQuery) {
+  // plugin setting is type string because of bug KAH-6258
+  if (showQuery === "YES") {
     connectionDetailsAugmented.showQuery = true;
   }
   return connectionDetailsAugmented;
 }
 
-// needed for copyStructure when destination is not as kaholo account
+// needed for copyStructure when destination is different server
 function createConDetFromString(connectionString, showQuery) {
   const connectionDetails = new ConnectionString(connectionString);
   const connectionDetailsAugmented = {
     host: connectionDetails.hosts[0].name,
     ...connectionDetails,
   };
-  if (showQuery) {
+  // plugin setting is type string because of bug KAH-6258
+  if (showQuery === "YES") {
     connectionDetailsAugmented.showQuery = true;
   }
   return connectionDetailsAugmented;
