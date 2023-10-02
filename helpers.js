@@ -1,6 +1,6 @@
 const { ConnectionString } = require("connection-string");
 
-function createConnectionDetails({ connectionString, password}, { showQuery }) {
+function createConnectionDetails({ connectionString, password }, { showQuery }) {
   const connectionDetails = new ConnectionString(connectionString);
   const connectionDetailsAugmented = {
     host: connectionDetails.hosts[0].name,
