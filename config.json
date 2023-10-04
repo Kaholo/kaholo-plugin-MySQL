@@ -1,0 +1,500 @@
+{
+  "name": "MySQL",
+  "type": "executer",
+  "imgUrl": "logo.png",
+  "execProgram": "node",
+  "main": "app.js",
+  "version": "4.0.0",
+  "description": "Run sql commands and scripts on MySQL servers.",
+  "category": "Database",
+  "keywords": [
+    "mysql",
+    "mysqldump",
+    "mysqladmin",
+    "sql",
+    "database",
+    "cli",
+    "mariadb",
+    "dump",
+    "restore",
+    "query"
+  ],
+  "auth": {
+    "authId": "connectionStringMysqlAccount",
+    "params": [
+      {
+        "name": "connectionString",
+        "viewName": "Connection String",
+        "description": "Connection string used to connect to the database",
+        "type": "string",
+        "learnUrl": "https://dev.mysql.com/doc/refman/8.0/en/connecting-using-uri-or-key-value-pairs.html",
+        "required": true
+      },
+      {
+        "name": "password",
+        "viewName": "Password",
+        "description": "Select password from the Kaholo vault if you don't want to enter it directly into the connection string. If both are provided, a password from Kaholo vault takes precedence",
+        "type": "vault"
+      }
+    ]
+  },
+  "settings":[{
+    "name": "showQuery",
+    "viewName": "Show queries in Activity Log (YES or NO)",
+    "description": "If enabled, fully formed queries are displayed in the Kaholo Activity Log before execution. Recommended only for diagnosing issues. Set to \"YES\" to enable.",
+    "comment": "plugin setting is type string because of bug KAH-6258",
+    "type": "string",
+    "default": "NO"
+  }],
+  "methods": [
+    {
+      "name": "testConnectivity",
+      "viewName": "Test Connectivity",
+      "params": []
+    },
+    {
+      "name": "executeQuery",
+      "viewName": "Execute Query",
+      "params": [
+        {
+          "name": "query",
+          "viewName": "Query String",
+          "type": "text",
+          "description": "The SQL query to execute",
+          "placeholder": "SELECT * FROM zoology.orders",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "executeSQLFile",
+      "viewName": "Execute SQL File",
+      "params": [
+        {
+          "name": "path",
+          "viewName": "SQL File Path",
+          "type": "string",
+          "required": true,
+          "parserType": "filePath",
+          "parserOptions": {
+            "throwIfDoesntExist": true,
+            "acceptedTypes": ["file"]
+          },
+          "description": "Path on Kaholo agent to the SQL file to execute",
+          "placeholder": "reports/weekly.sql",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "insertData",
+      "viewName": "Insert Data Into Table",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "required": true,
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "Database containing the table.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "required": true,
+          "autocompleteType": "function",
+          "functionName": "listTablesAuto",
+          "description": "The table to insert data into.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "data",
+          "viewName": "Data",
+          "type": "text",
+          "required": true,
+          "parserType": "object",
+          "description": "Data in the form of an array of objects from the code layer or a JSON text respresentation"
+        }
+      ]
+    },
+    {
+      "name": "listDbs",
+      "viewName": "List Databases",
+      "params": []
+    },
+    {
+      "name": "listTables",
+      "viewName": "List Tables",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesOrAll",
+          "description": "Database name to retrieve data from.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "getDbSize",
+      "viewName": "Get Databases Size",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesOrAll",
+          "description": "Database name to retrieve data from.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "getTablesSize",
+      "viewName": "Get Tables Size",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesOrAll",
+          "description": "Database name to retrieve data from.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listTablesOrAll",
+          "description": "Table name to retrieve the size status from.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "getTablesLockedStatus",
+      "viewName": "Get Tables Locked Status",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Database",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "Database name to retrieve data from.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listTablesAuto",
+          "description": "Table name to retrieve the lock status from.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "copyStructure",
+      "viewName": "Copy Table Structure",
+      "params": [
+        {
+          "name": "db",
+          "viewName": "Source DB",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "The DB containing the source table.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "srcTable",
+          "viewName": "Source Table",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listTablesAuto",
+          "description": "Copy this table's structure",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "destConStr",
+          "viewName": "Destination Connection String",
+          "type": "vault",
+          "description": "The vaulted connection string of the MySQL server into which to copy the table structure, if copying to another server. This string must include password. Format - mysql://myuser:mypasswd@10.11.22.33:3306/mydb?SslMode=Preferred",
+          "placeholder": "Select or create vault item",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "destDb",
+          "viewName": "Destination DB",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listDatabasesAuto",
+          "description": "The DB to contain the destination table.",
+          "placeholder": "dbname",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "destTable",
+          "viewName": "Destination Table Name",
+          "type": "string",
+          "description": "Copy the source table structure into a table with this name.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "override",
+          "viewName": "Override Destination Table",
+          "type": "boolean",
+          "default": false,
+          "description": "If true, allow the destination table to be an existing table and try coping the data from it to the new structure. If false throw an error in case the destination table already exists."
+        }
+      ]
+    },
+    {
+      "name": "listUsers",
+      "viewName": "List Users",
+      "params": []
+    },
+    {
+      "name": "listRoles",
+      "viewName": "List Roles",
+      "params": []
+    },
+    {
+      "name": "createUser",
+      "viewName": "Create User",
+      "params": [
+        {
+          "name": "user",
+          "viewName": "Username",
+          "type": "string",
+          "description": "Name for new user",
+          "placeholder": "username",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "host",
+          "viewName": "Host",
+          "type": "string",
+          "description": "IP or named host from which user may connect, or leave empty for '%' (any host)",
+          "placeholder": "%",
+          "default": "localhost",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "pass",
+          "viewName": "Password",
+          "type": "vault",
+          "description": "Password for the new user",
+          "placeholder": "Select or create vault item",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "changePass",
+          "viewName": "Change Password On Login",
+          "type": "boolean",
+          "default": false,
+          "description": "Force user to change password on initial login",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "role",
+          "viewName": "Default Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listRolesAuto",
+          "description": "Optional role to assign as user's default role, leave empty for no default role.",
+          "placeholder": "Select one",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "createRole",
+      "viewName": "Create Role",
+      "params": [
+        {
+          "name": "role",
+          "viewName": "Role Name",
+          "type": "string",
+          "description": "The name of the new role",
+          "placeholder": "mynewrole",
+          "required": "true",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "grantRole",
+      "viewName": "Grant Role to User",
+      "params": [
+        {
+          "name": "user",
+          "viewName": "User",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listUsersAuto",
+          "description": "The user to be granted a role",
+          "placeholder": "Please select a user",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "role",
+          "viewName": "Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listRolesAuto",
+          "description": "The role to grant to the user",
+          "placeholder": "Please select a role",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "grantPermissions",
+      "viewName": "Grant Permissions",
+      "params": [
+        {
+          "name": "user",
+          "viewName": "User or Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listUsersRolesAuto",
+          "description": "The user or role to be granted permissions",
+          "placeholder": "'dbreaders'@'%'",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "db",
+          "viewName": "DB",
+          "type": "autocomplete",
+          "required": true,
+          "autocompleteType": "function",
+          "functionName": "listDatabasesOrAll",
+          "description": "Database to which access will be granted",
+          "placeholder": "mydb",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "table",
+          "viewName": "Table",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listTablesOrAll",
+          "description": "Table to which access will be granted. If none specified, access will be granted to entire database.",
+          "placeholder": "tablename",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        },
+        {
+          "name": "scope",
+          "viewName": "Permission Scope",
+          "type": "options",
+          "default": "read",
+          "required": true,
+          "options": [
+            {
+              "id": "read",
+              "name": "Read Only"
+            },
+            {
+              "id": "write",
+              "name": "Write/Update Only"
+            },
+            {
+              "id": "readWrite",
+              "name": "Read And Write"
+            },
+            {
+              "id": "full",
+              "name": "Full Access"
+            },
+            {
+              "id": "fullWithGrant",
+              "name": "Full Access with Grant Option"
+            }
+          ],
+          "description": "Select the access rights to grant",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "showGrants",
+      "viewName": "Show Grants",
+      "params": [
+        {
+          "name": "user",
+          "viewName": "User or Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listUsersRolesAuto",
+          "description": "The user or role for whom to show grants",
+          "placeholder": "'dbreaders'@'%'",
+          "required": true,
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }]
+    },
+    {
+      "name": "getServerVersion",
+      "viewName": "Get MySQL Server Version",
+      "params": []
+    },
+    {
+      "name": "deleteUser",
+      "viewName": "Delete User",
+      "params": [
+        {
+          "name": "user",
+          "viewName": "User",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listUsersAuto",
+          "description": "The user to delete.",
+          "placeholder": "username",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    },
+    {
+      "name": "deleteRole",
+      "viewName": "Delete Role",
+      "params": [
+        {
+          "name": "role",
+          "viewName": "Role",
+          "type": "autocomplete",
+          "autocompleteType": "function",
+          "functionName": "listRolesAuto",
+          "description": "The role to delete",
+          "placeholder": "Please select a role",
+          "learnUrl": "https://dev.mysql.com/doc/"
+        }
+      ]
+    }
+  ]
+}

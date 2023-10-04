@@ -1,167 +1,231 @@
-# kaholo-plugin-mysql
-Kaholo Plugin for running scripts and queries on MySQL servers.
+# Kaholo MySQL Plugin
+This plugin extends Kaholo's capabilities to include running SQL queries and scripts in MySQL. It does so by means of the [mysql npm package](https://www.npmjs.com/package/mysql). There is another plugin, the [Kaholo MySQL CLI Plugin](https://github.com/Kaholo/kaholo-plugin-MySQL-CLI#readme) that executes `mysql` commands directly on the Kaholo agent.
 
-## Settings
-1. Connection String (Vault) **Required if not in method** - The connection string to use by default when connecting to the MySQL server.
+The methods available to the CLI and non-CLI Kaholo MySQL plugins vary some, but which to use is largely a matter of personal preference. Considerations include:
+* CLI version also does database dump and restore, using `mysqldump` and `mysqladmin`.
+* CLI version may work using whatever version of mysql clients are installed on the Kaholo agent.
+* Non-CLI version has methods for creating users and roles and granting permissions.
+* Non-CLI version does not require MySQL client to be installed on the Kaholo agent.
+* Non-CLI version works even on Windows Kaholo agents.
+* Non-CLI version has many methods that run specific queries for the user without having to write any SQL.
+* Non-CLI version puts result set into JSON format automatically, which makes provides for easier access using the Kaholo code layer.
 
-Can be in one of these two formats:
-* ```Server=myServerAddress;Port=3306;Database=myDataBase;Uid=myUsername;Pwd=myPassword;```
-* ```mysql://myUsername:myPassword@myServerAddress:myServerPort/myDataBase```
+If you would like to see either of the plugins enhanced or find a bug please do not hesitate to [contact us](https://kaholo.io/contact/).
 
-You can learn more about MySQL connection strings [here](https://dev.mysql.com/doc/connector-net/en/connector-net-connections-string.html#:~:text=The%20MySqlConnection%20object%20is%20configured,value%20pairs%2C%20separated%20by%20semicolons.&text=In%20this%20example%2C%20the%20MySqlConnection,and%20a%20password%20of%2012345%20.).
+Another alternative to any CLI plugin is one can run any arbitrary command (including `mysql` ones) on the Kaholo Agent using the [Command Line Plugin](https://github.com/Kaholo/kaholo-plugin-cmd/releases/tag/v3.2.0). This may provide an immediate and/or temporary solution if the MySQL plugin is not providing the required action.
 
-## Method: Execute Query
-Execute the specified SQL query on the connected MySQL database. 
+## Forks of MySQL
+When MySQL came under control of Oracle various open-source forks were created, the most common being MariaDB. This plugin will likely work for any of these variants of MySQL.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Query String (Text) **Required** - The SQL query to run on the connected database. You can enter multiple commands separated by ';'.
+## Plugin Settings
+Settings and Accounts are configured by clicking on Settings | Plugins and then the name of the plugin, `MySQL CLI`, in the list of plugins is a hyperlink to Settings and Accounts for this plugin. An Account is required to use the plugin. The setting is optional.
 
-## Method: Execute SQL File
-Execute the SQL file in the specified path.
+Plugin Settings normally serve as default values for Action parameters, but in the case of this plugin there is only one setting that is a global parameter for all actions that use this plugin. It is "Show Queries in Activity Log". If enabled, every method of the plugin will show the fully-formed SQL Query in the Activity Log prior to execution. This can be helpful in diagnosing exactly what the plugin is doing, especially useful when the result it unexpected. However it may also expose sensitive information, such the the IDENTIFIED BY clause of user account creation, in which case the password will be exposed in the UI and recording in the Kaholo logs in plain text.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server.  The format of the connection string is specified in the settings.
-2. SQL File Path (String) **Required** - The path to the SQL script file to execute.
+## Plugin Account
+The MySQL CLI Plugin uses Kaholo Accounts to manage the connection string and password. This is for convenience and security. Once a default account is configured all new MySQL actions will automatically inherit it, so the same authentication details are pre-configured every time. If multiple accounts are configured, at the Action level which account to use is selected from a drop-down list.
 
-## Method: Insert Data To Table
-Insert all provided data to the specified table. Data is passed in the format of an array of objects, with matching fields names to the inserted table.
+The password is optionally stored in the Kaholo Vault so it does not appear in configuration, logs, or the user interface when used. It may also be included as part of the connection string. If both are used, the vaulted password will be used instead of the one in the connection string.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Database (Autocomplete) **Optional** - If specified, you can filter tables only from the specified database. Default value is the database in the connection string or the server's default database.
-3. Table (Autocomplete) **Required** - The table to insert the data into.
-4. Data (Array Of Objects) **Required** - The data to insert into the specified table. Should be passed in the format of an array of objects with matching fields to the specified table.
+A typical connection string for MySQL looks something like this:
+
+    Server=10.11.22.33;Port=3306;Database=mydb;Uid=myuser;Pwd=mypasswd;SslMode=Preferred;
+
+The plugin is using a more universal [connection string format](https://www.npmjs.com/package/connection-string). The above connection string would be rewritten as:
+
+    mysql://myuser:mypasswd@10.11.22.33:3306/mydb?SslMode=Preferred
+
+The "mysql" protocol and SslMode elements are not implemented by the plugin, the connection string can be shortened:
+
+    myuser:mypasswd@10.11.22.33:3306/mydb
+
+If the password is in the Kaholo Vault instead of the connection string, the connection string can be shorter still:
+
+    myuser@10.11.22.33:3306/mydb
+
+Finally, the connection string can omit the database. When doing this the queries themselves are responsible to `USE <DATABASE_NAME>` when appropriate. For example to `SHOW TABLES;` of mydb with this connection string:
+
+    myuser@10.11.22.33:3306
+
+One must include `USE mydb;` in the query:
+
+    USE mydb; SHOW TABLES;
+
+## Users and Roles
+Many methods refer to users and roles, which are very similar constructs in MySQL and both stored in table `mysql.user`. For the purpose of keeping the plugin simple, the following assumptions are made:
+* roles have accounts locked
+* roles have no passwords
+* roles have host of '%' (unrestricted)
+* users have acounts not locked
+* users have passwords
+* users may have any host - '%', 'localhost', a FQDN, etc.
+* roles are granted to users
+
+If any of these simplifications create difficulty, they are easily worked around by just running the appropriate SQL Query instead of using the more user-friendly methods provided in the plugin. For example `CREATE ROLE 'myrole'@'localhost' IDENTIFIED AS 'apl30ekg'`. The method `Create Role` of the plugin would never run such a query but the `Execute Query` method will attempt to run any query precisely as specified.
 
 ## Method: Test Connectivity
-Test if able to connect to the specified connection string.
+Make a test connection to confirm the Kaholo Account including connection string and password are correctly configured and that the database is accessible on the network from the Kaholo agent.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
+## Method: Execute Query
+Execute any arbitrary query. This requries a correctly written SQL query to work. It is the least user-friendly method but also the most versatile.
 
-## Method: Get Tables Locked Status
-Retrieve whether the specified tables are locked (In Use) or not.
+### Parameter: Query String
+The query to execute.
 
-If a specific table or database wasn't specified, it retrieves data on all of them:
-* All tables inside a specific database 
-* All tables inside all databases the user has access to in the server
+## Method: Execute SQL File
+Execute any arbitrary query written in a file on the Kaholo agent.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Database (Autocomplete) **Required for parameter 3** - The database to retrieve data on his tables. If not specified, return data from all tables of all databases the user has access to.
-3. Table (Autocomplete) **Optional** - The table to retrieve whether is locked or not. If not specified, retrieve data on all tables in the specified database.
+### Parameter: SQL File Path
+Path to the file on the Kaholo agent containing the query to be executed. The path may be relative or absolute. If relative, it is relative to the default working directory on the Kaholo agent, e.g. `/twiddlebug/workspace`.
 
-## Method: Get MySQL Server Version
-Return the version of the connected MySQL server.
+## Method: Insert Data Into Table
+Insert data into a Table. Inserts data in the format of an array of JSON objects into a table. 
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
+### Parameter: Database
+The database into which the data is to be inserted.
 
-## Method: Get Databases Size
-Get the size of the specified database, or of all databases the user has access to.
+### Parameter: Table
+The table into which the data is to be inserted.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Database (Autocomplete) **Optional** - The database to return its size. If not specified, return data on databases in the server that the user has access to.
+### Parameter: Data
+The data to insert. Provide the data as an array of objects or a string JSON representation of the same. The keys of the object must match the headers of the table for this to work. For example if the table has headers `name` and `job`, the following could be inserted into the table:
 
-## Method: Get Tables Size
-Get the specified table size, or of all tables.
+object data as code:
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Database (Autocomplete) **Required for parameter 3** - The database to return info about its tables. If not specified, return data on all tables in all databases.
-3. Table (Autocomplete) **Optional** - The table to return its size. If not specified, return data on all tables inside the specified database.
+    const data = [{
+                    name: "Jill",
+                    job: "Doctor"
+                }]
 
-## Method: Create User
-Create a new user with the specified permmisions. If fails to grant permissions, this method won't create a new user as it runs the entire command as a transaction.
+or as text:
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - TThe connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Username (String) **Required** - The username of the new user to create. Needs to be unique and not in use.
-3. Password (Vault) **Required** - The password of the new user.
-4. Change Password On Login (Boolean) **Optional** - If true, requires the user to change his password on his first login. Default value is false.
-5. Role (Autocomplete) **Optional** - If specified, assign the specified role and its permissions to the new user.
-6. DB Permission (Autocomplete) **Required for parameter 7** - If specified, and permissions scope was chosen, give the new user access to the specified database. Default value is all databases.
-7. Table Permission (Autocomplete) **Optional** - If specified, and permissions scope was chosen, give the new user access to the specified table. Default value is all tables in the specified database.
-8. Permission Scope (Options) **Required to give permissions** - The scope of permissions to give to the new user. Possible values are:
-* ```Read Only``` - Can only execute ```SQL SELECT``` commands.
-* ```Write (Insert/Update/Delete) Only ``` - Can execute ```SQL INSERT\UPDATE\DELETE``` commands only.
-* ```Read And Write``` - Can execute ```SQL SELECT\INSERT\UPDATE\DELETE``` commands.
-* ```Full Access``` - Can execute any SQL command.
-
-## Method: Grant Permissions
-Grant the specified permissions to the specified user.
-
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. User (Autocomplete) **Required** - The user to grant permissions to.
-3. DB (Autocomplete) **Required for parameter 4** - The name of the database to grant permissions on. Default value is all databases.
-4. Table (Autocomplete) **Optional** - The name of the table to grant permissions on. Default value is all tables in the specified database.
-5. Permission Scope (Options) **Required If No Role** - The scope of permissions to give to the new user. Possible values are:
-* ```Read Only``` - Can only execute ```SQL SELECT``` commands.
-* ```Write (Insert/Update/Delete) Only ``` - Can execute ```SQL INSERT\UPDATE\DELETE``` commands only.
-* ```Read And Write``` - Can execute ```SQL SELECT\INSERT\UPDATE\DELETE``` commands.
-* ```Full Access``` - Can execute any SQL command.
-6. Role (Autocomplete) **Required If No Permission Scope** - The role to assign to the user. Can't be specified together with permmision scope, db, and table parameter.
-
-## Method: Create Role
-Create a new role and grant its permissions if specified. If fails to grant permissions, this method won't create a new role as it runs the entire command as a transaction.
-
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Role Name (String) **Required** - The name of the new role to create.
-3. DB (Autocomplete) **Required for parameter 4** - The name of the database to grant permissions on. Default value is all databases.
-4. Table (Autocomplete) **Optional** - The name of the table to grant permissions on. Default value is all tables in the specified database.
-5. Permission Scope (Options) **Required to grant permission** - The scope of permissions to give to the new user. Possible values are:
-* ```Read Only``` - Can only execute ```SQL SELECT``` commands.
-* ```Write (Insert/Update/Delete) Only ``` - Can execute ```SQL INSERT\UPDATE\DELETE``` commands only.
-* ```Read And Write``` - Can execute ```SQL SELECT\INSERT\UPDATE\DELETE``` commands.
-* ```Full Access``` - Can execute any SQL command.
-
-## Method: Delete User
-Delete the specified user (can also be a role).
-
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. User (Autocomplete) **Required** - The user or role to delete.
-
-## Method: Copy Table Structure
-Copy a table schema only (with no data inside) from the specified database and table to the specified destination database and table name.
-
-If destination table already exists in the destination database, create a new temporary table with "__temp" suffix to the name specified, then try to copy old data from old destination table to the new temporary table. Afterwards, if copy was successful, delete the old destination table and rename the temporary table to be the new destination table. If fails in any step other than renaming the temporary table, will rollback any changes done in this action. If fails in renaming the temporary table, won't be able to rollback any changes.
-
-### Parameters
-1. Source Connection String (Vault) **Required if not in settings** - The connection string to use to connect to the MySQL server containing the source table. Will use the value specified in the settings if not specified.
-2. Source Database (Autocomplete) **Optional** - The name of the database containing the source schema to be copied. If not specified, will use the database specified in the connection string or the default database of the server.
-3. Source Table (Autocomplete) **Required** - The name of the source table to copy its schema.
-4. Destination Connection String (Vault) **Required if not specified params 5 or 6** - The connection string to use to connect to the MySQL server to copy the schema into. Will use Source Connection String if not specified.
-5. Destination Database (Autocomplete) **Required if not specified params 4 or 6** - The name of the database containing the source schema to be copied. If not specified will use the database specified in the connection string or the default database of the server.
-6. Destination Table (Autocomplete) **Required if not specified params 4 or 5** - The name of the new table to copy the source schema into.
-* **Must provide at least one of the parameters 4, 5, or 6**
-7. Override Destination Table (Autocomplete) **Optional** - If false and destination table already exists, throw an error. If true and the destination table aleady exists, try to copy all data from it to a temporary table with the new schema, and than drop the original table and rename the temporary table to be the new destination table.
-
+    [{"name":"Jack","job":"Pilot"},{"name":"Johan","job":"Copilot"}]
 
 ## Method: List Databases
-List all databases in the connected MySQL server.
-
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-
-## Method: List Roles
-List all roles in the connected MySQL server.
-
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-
-## Method: List Users
-List all users in the connected MySQL server.
-
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
+Lists all databases - the same as running query "SHOW DATABASES;"
 
 ## Method: List Tables
-List tables of the specified database in the connected MySQL server.
+List all tables in the specified database, or if none specified in all databases.
 
-### Parameters
-1. Connection String (Vault) **Required if not in settings** - The connection string to use by default when connecting to the MySQL server. The format of the connection string is specified in the settings.
-2. Database (Autocomplete) **Optional** - The database to list its tables. If not specified use the database described in the connection string or the default database in the server.
+### Parameter: Database
+Specify a database to list only tables in that database.
+
+## Method: Get Databases Size
+Gets the size of one or more databases in Mb.
+
+### Parameter: Database
+Specify a database to get the size of only that database. If non specified the size of all databases is retrieved.
+
+## Method: Get Tables Size
+Gets the size of one or more tables in Mb.
+
+### Parameter: Database
+Specify a database to get the size of tables only in that database.
+
+### Parameter: Table
+Specifiy a table to get the size of one specific table.
+
+## Method: Get Tables Locked Status
+Gets the locked status of one or more tables.
+
+### Parameter: Database
+Specify a database to get the locked status of tables only in that database.
+
+### Parameter: Table
+Specifiy a table to get the locked status of one specific table.
+
+## Method: Copy Table Structure
+Copies a table structure, but not the data, from one server-database-table to another.
+
+### Parameter: Source DB
+The source database of the table to be copied.
+
+### Parameter: Source Table
+The table to be copied - in structure only, not including the row data.
+
+### Parameter: Destination Connection String
+A connection string to another database server. If not specified, the source server is assumed.
+
+### Parameter: Destination DB
+The destination database for the copy of the table structure. If not specified the same database of the source is assumed.
+
+### Parameter: Destination Table Name
+A name for the copy table. If not specified the same name as the source table is assumed.
+
+### Parameter: Override Destination Table
+If enabled and the destination table already exists, copy the structure anyway. Otherwise end in error.
+
+## Method: List Users
+Lists know users in the MySQL Server.
+
+## Method: List Roles
+List known roles in the MySQL Server.
+
+## Method: Create User
+Creates a new user account in the MySQL Server.
+
+### Parameter: Username
+A name for the new user.
+
+### Parameter: Host
+Host from which the new user account is permitted to connect. If none specified `%` (all hosts) is assumed.
+
+### Parameter: Password
+A password for the new user. The password is vaulted in the Kaholo vault so it does not appear in the UI, log files, or error messages. Be careful not to use plugin setting `Show Queries in Activity Log` if creating users.
+
+### Parameter: Change Password On Login
+If enabled, the user will be forced to change password upon login. This adds `PASSWORD EXPIRE` to the `CREATE USER` query.
+
+### Parameter: Default Role
+Optionally assing the user a default role upon creation. Roles can be granted to users after creation using method `Grant Role to User`.
+
+## Method: Create Role
+Create a new role. Permissions can be assigned to the role using method `Grant Permissions`.
+
+### Parameter: Role Name
+A name for the new role.
+
+## Method: Grant Role to User
+Grant a role to a user. Multiple roles may be granted to a user by using this method multiple times.
+
+### Parameter: User
+The user to receive the grant.
+
+### Parameter: Role
+The role to be granted.
+
+## Method: Grant Permissions
+Grant permissions either directly to users or to roles.
+
+### Parameter: User or Role
+The user or role to which to grant permissions.
+
+### Parameter: DB
+The database that is the subject of the grant.
+
+### Parameter: Table
+A specific table to be subject of the grant. If not specified the grant is for the whole database instead.
+
+### Parameter: Permission Scope
+The specific permissions to grant.
+
+## Method: Show Grants
+Show the grants bestowed upon a user or role.
+
+### Parameter: User or Role
+The user or role who's grants are to be shown.
+
+## Method: Get MySQL Server Version
+Get the version of the MySQL server to which the plugin is connecting using the plugin account connection string and credentials.
+
+## Method: Delete User
+Delete a user from the MySQL server.
+
+### Parameter: User
+The user to delete.
+
+## Method: Delete Role
+Delete a role from the MySQL server.
+
+### Parameter: Role
+The role to delete.
