@@ -4,7 +4,7 @@
   "imgUrl": "logo.png",
   "execProgram": "node",
   "main": "app.js",
-  "version": "3.0.8",
+  "version": "4.0.0",
   "description": "Run sql commands and scripts on MySQL servers.",
   "category": "Database",
   "keywords": [
@@ -40,10 +40,11 @@
   },
   "settings":[{
     "name": "showQuery",
-    "viewName": "Show queries in Activity Log",
-    "description": "If enabled, fully formed queries are displayed in the Kaholo Activity Log before execution. Recommended only for diagnosing issues.",
-    "type": "boolean",
-    "default": false
+    "viewName": "Show queries in Activity Log (YES or NO)",
+    "description": "If enabled, fully formed queries are displayed in the Kaholo Activity Log before execution. Recommended only for diagnosing issues. Set to \"YES\" to enable.",
+    "comment": "plugin setting is type string because of bug KAH-6258",
+    "type": "string",
+    "default": "NO"
   }],
   "methods": [
     {
@@ -264,6 +265,7 @@
           "name": "override",
           "viewName": "Override Destination Table",
           "type": "boolean",
+          "default": false,
           "description": "If true, allow the destination table to be an existing table and try coping the data from it to the new structure. If false throw an error in case the destination table already exists."
         }
       ]
@@ -313,7 +315,7 @@
           "name": "changePass",
           "viewName": "Change Password On Login",
           "type": "boolean",
-          "default": "false",
+          "default": false,
           "description": "Force user to change password on initial login",
           "learnUrl": "https://dev.mysql.com/doc/"
         },
